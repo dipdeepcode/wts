@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: dipdeepcode/wts-postgres:17.4-alpine
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      TZ: Europe/Moscow
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      IAM_DB_USER: ${IAM_DB_USER}
+      IAM_DB_PASS: ${IAM_DB_PASS}
+      IAM_DB_NAME: ${IAM_DB_NAME}
+      SESSIONS_DB_USER: ${SESSIONS_DB_USER}
+      SESSIONS_DB_PASS: ${SESSIONS_DB_PASS}
+      SESSIONS_DB_NAME: ${SESSIONS_DB_NAME}
+      BACKEND_DB_USER: ${BACKEND_DB_USER}
+      BACKEND_DB_PASS: ${BACKEND_DB_PASS}
+      BACKEND_DB_NAME: ${BACKEND_DB_NAME}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db_vol:/var/lib/postgresql/data
+    networks:
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  db_vol:
+    name: db_vol
+
+networks:
+  db_net:
+    name: db_net

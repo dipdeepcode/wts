@@ -1,0 +1,72 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+#      - 'docker-compose.yml'
+      - 'database/**'
+      - '.github/workflows/deploy-db.yml'
+
+jobs:
+  deploy-infra:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1. Очистка целевой папки инфраструктуры на сервере перед копированием файлов
+      - name: Prepare Directory via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p /var/www/dipdeepcode/infra
+            rm -rf /var/www/dipdeepcode/infra/database
+
+      # 2. Копируем docker-compose.yml и папку database со всеми вложенными файлами
+      - name: Copy Config and Database Files to VDS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "docker-compose.yml,database/**"
+          target: "/var/www/dipdeepcode/infra"
+
+      # 3. Пересобираем и запускаем контейнер с передачей секретов
+      - name: Build and Start Postgres via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /var/www/dipdeepcode/infra
+            
+            # Экспортируем секреты из GitHub Secrets в окружение сервера
+            export POSTGRES_PASS="${{ secrets.ROOT_DB_PASS }}"
+            
+            export IAM_DB_USER="${{ secrets.IAM_DB_USER }}"
+            export IAM_DB_PASS="${{ secrets.IAM_DB_PASS }}"
+            export IAM_DB_NAME="${{ vars.IAM_DB_NAME }}"
+            
+            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
+            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
+            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
+            
+            export BACKEND_DB_USER="${{ secrets.BACKEND_DB_USER }}"
+            export BACKEND_DB_PASS="${{ secrets.BACKEND_DB_PASS }}"
+            export BACKEND_DB_NAME="${{ vars.BACKEND_DB_NAME }}"
+            
+            # Принудительно останавливаем, пересобираем образ (флаг --build) и запускаем в фоне
+            docker compose down
+            docker compose up -d --build
