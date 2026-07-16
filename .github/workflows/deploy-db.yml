@@ -1,12 +1,13 @@
-name: Deploy Infrastructure
+name: Deploy Infrastructure (Postgres & Keycloak Build)
 
 on:
   push:
     branches:
       - master
     paths:
-#      - 'docker-compose.yml'
+      - 'docker-compose.yml'
       - 'database/**'
+      - 'iam/**'
       - '.github/workflows/deploy-db.yml'
 
 jobs:
@@ -27,8 +28,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            mkdir -p /var/www/dipdeepcode/infra
-            rm -rf /var/www/dipdeepcode/infra/database
+            mkdir -p ${{ vars.SERVER_INFRA_PATH }}
+            rm -rf ${{ vars.SERVER_INFRA_PATH }}/database
+            rm -rf ${{ vars.SERVER_INFRA_PATH }}/iam
 
       # 2. Копируем docker-compose.yml и папку database со всеми вложенными файлами
       - name: Copy Config and Database Files to VDS
@@ -38,8 +40,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "docker-compose.yml,database/**"
-          target: "/var/www/dipdeepcode/infra"
+          source: "docker-compose.yml,database/**,iam/**"
+          target: "${{ vars.SERVER_INFRA_PATH }}"
 
       # 3. Пересобираем и запускаем контейнер с передачей секретов
       - name: Build and Start Postgres via SSH
@@ -50,22 +52,32 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /var/www/dipdeepcode/infra
+            # Присваиваем значение в bash-переменную для удобства работы внутри скрипта
+            INFRA_PATH="${{ vars.SERVER_INFRA_PATH }}"
+            cd "$INFRA_PATH"
             
-            # Экспортируем секреты из GitHub Secrets в окружение сервера
+            sed -i 's/\r$//' database/init_db.sh 2>/dev/null || true
+            
+            # Секреты для БД
+            export POSTGRES_USER="${{ secrets.ROOT_DB_USER }}"
             export POSTGRES_PASS="${{ secrets.ROOT_DB_PASS }}"
-            
             export IAM_DB_USER="${{ secrets.IAM_DB_USER }}"
             export IAM_DB_PASS="${{ secrets.IAM_DB_PASS }}"
             export IAM_DB_NAME="${{ vars.IAM_DB_NAME }}"
-            
             export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
             export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
             export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
-            
             export BACKEND_DB_USER="${{ secrets.BACKEND_DB_USER }}"
             export BACKEND_DB_PASS="${{ secrets.BACKEND_DB_PASS }}"
             export BACKEND_DB_NAME="${{ vars.BACKEND_DB_NAME }}"
+            
+            # Секреты для Keycloak
+            export KEYCLOAK_ADMIN_USER="${{ secrets.KEYCLOAK_ADMIN_USER }}"
+            export KEYCLOAK_ADMIN_PASS="${{ secrets.KEYCLOAK_ADMIN_PASS }}"
+            
+            # Окружение хоста для работы за Nginx прокси
+            export KC_PROXY="${{ vars.KC_PROXY }}"
+            export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
             
             # Принудительно останавливаем, пересобираем образ (флаг --build) и запускаем в фоне
             docker compose down
