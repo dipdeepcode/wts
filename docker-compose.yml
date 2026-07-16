@@ -54,7 +54,7 @@ services:
       KC_HTTP_ENABLED: true
       KC_CACHE: local
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8085:8080"
     networks:
       - db_net
     depends_on:
