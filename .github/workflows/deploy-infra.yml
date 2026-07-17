@@ -1,4 +1,4 @@
-name: Deploy Infrastructure (Postgres, Keycloak & Gateway Build)
+name: Deploy Infrastructure (Postgres, Keycloak)
 
 on:
   push:
@@ -8,8 +8,7 @@ on:
       - 'docker-compose.yml'
       - 'database/**'
       - 'iam/**'
-      - 'gateway/**'                          # Отслеживаем изменения в папке шлюза
-      - '.github/workflows/deploy-db.yml'
+      - '.github/workflows/deploy-infra.yml'
 
 jobs:
   deploy-infra:
@@ -32,7 +31,6 @@ jobs:
             mkdir -p ${{ vars.SERVER_INFRA_PATH }}
             rm -rf ${{ vars.SERVER_INFRA_PATH }}/database
             rm -rf ${{ vars.SERVER_INFRA_PATH }}/iam
-            rm -rf ${{ vars.SERVER_INFRA_PATH }}/gateway # Очищаем старые исходники шлюза
 
       # 2. Копируем конфигурации и папки со всеми вложенными файлами на VDS
       - name: Copy Config and Source Files to VDS
@@ -42,7 +40,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "docker-compose.yml,database/**,iam/**,gateway/**" # Добавили gateway в копирование
+          source: "docker-compose.yml,database/**,iam/**"
           target: "${{ vars.SERVER_INFRA_PATH }}"
 
       # 3. Пересобираем образы и запускаем контейнеры с передачей секретов
@@ -78,11 +76,7 @@ jobs:
             export KEYCLOAK_ADMIN_PASS="${{ secrets.KEYCLOAK_ADMIN_PASS }}"
             
             # Окружение хоста для работы за Nginx прокси
-            export KC_PROXY="${{ vars.KC_PROXY }}"
             export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
-            
-            # Секреты для Spring Cloud Gateway
-            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}" # Передаем секрет OAuth2 клиента
             
             # Принудительно останавливаем, пересобираем все три кастомных образа и запускаем в фоне
             docker compose down

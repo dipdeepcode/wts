@@ -1,0 +1,74 @@
+name: Deploy Gateway
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'gateway/**'
+      - '.github/workflows/deploy-gateway.yml'
+  workflow_run:
+    workflows: ["Deploy Infrastructure (Postgres, Keycloak)"]
+    types:
+      - completed
+
+jobs:
+  deploy-gateway:
+    environment: production
+    runs-on: ubuntu-latest
+
+    # Если запуск произошел через workflow_run, проверяем, что предыдущий шаг завершился именно УСПЕШНО
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1. Очищаем только папку gateway на сервере, оставляя базу и iam нетронутыми
+      - name: Prepare Gateway Directory via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            rm -rf ${{ vars.SERVER_INFRA_PATH }}/gateway
+
+      # 2. Копируем docker-compose.yml и обновленную папку gateway на VDS
+      - name: Copy Gateway Files to VDS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "docker-compose.yml,gateway/**"
+          target: "${{ vars.SERVER_INFRA_PATH }}"
+
+      # 3. Пересобираем и перезапускаем ТОЛЬКО контейнер gateway
+      - name: Rebuild and Restart Gateway via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd "${{ vars.SERVER_INFRA_PATH }}"
+            
+            # Экспортируем секрет для Spring Cloud Gateway
+            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
+            
+            # Переменные для подключения к базе сессий
+            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
+            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
+            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
+            export FRONTEND_URL="${{ vars.FRONTEND_URL }}"
+            export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
+            export KC_REALM_NAME="${{ vars.KC_REALM_NAME }}"
+            export GATEWAY_CLIENT_ID="${{ vars.GATEWAY_CLIENT_ID }}"
+
+            # Ключевая команда: указываем имя конкретного сервиса 'gateway'
+            # Docker Compose пересоберет только его Dockerfile и перезапустит один контейнер
+            docker compose up -d --build gateway

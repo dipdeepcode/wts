@@ -1,4 +1,4 @@
-name: CI/CD Deploy to VDS
+name: Deploy Web-ui
 
 on:
   push:
@@ -7,11 +7,19 @@ on:
     paths:
       - 'web-ui/**'
       - '.github/workflows/deploy_web-ui.yml'
+  # Автоматический запуск после успешного деплоя шлюза
+  workflow_run:
+    workflows: ["Deploy Gateway"]
+    types:
+      - completed
 
 jobs:
   deploy:
     environment: production
     runs-on: ubuntu-latest
+
+    # Запускаем только при пуше или если шлюз деплоился и завершился успехом
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     defaults:
       run:

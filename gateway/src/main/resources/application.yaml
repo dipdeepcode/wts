@@ -11,13 +11,13 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: https://auth.dipdeepcode.ru/realms/WTS
+            issuer-uri: ${KC_HOSTNAME}/realms/${KC_REALM_NAME}
         registration:
           keycloak:
             provider: keycloak
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            client-id: gateway
+            client-id: ${GATEWAY_CLIENT_ID}
             client-secret: ${GATEWAY_CLIENT_SECRET}
             scope:
               - openid
@@ -32,3 +32,39 @@ spring:
     username: ${SESSIONS_DB_USER}
     password: ${SESSIONS_DB_PASS}
     driver-class-name: org.postgresql.Driver
+
+com:
+  c4-soft:
+    springaddons:
+      oidc:
+        ops:
+          - iss: ${KC_HOSTNAME}/realms/${KC_REALM_NAME}
+            aud: ${GATEWAY_CLIENT_ID}
+        client:
+          # Внешний адрес вашего фронтенда Angular
+          client-uri: ${FRONTEND_URL}
+          post-login-allowed-uri-patterns:
+            - ${FRONTEND_URL}/workspaces
+            - ${FRONTEND_URL}
+          post-logout-allowed-uri-patterns:
+            - ${FRONTEND_URL}
+          security-matchers:
+            - /login/**
+            - /oauth2/**
+            - /logout/**
+            - /api/**
+          permit-all:
+            - /login/**
+            - /oauth2/**
+            - /login-options
+            - /api/me
+          # Защита от CSRF. Библиотека создаст куку XSRF-TOKEN, которую Angular прочитает автоматически
+          csrf: cookie-accessible-from-js
+          oauth2-redirections:
+            # При логауте шлюз корректно оповестит Keycloak (302 редирект)
+            rp-initiated-logout: ACCEPTED
+            # Для API эндпоинтов шлюз вернет 401 вместо 302 редиректа на форму ввода пароля.
+            # Это заставит Angular перехватить 401 ошибку и самостоятельно сделать редирект
+            # браузера на эндпоинт инициализации: /oauth2/authorization/keycloak
+            authentication-entry-point: UNAUTHORIZED
+          pkce-forced: true
