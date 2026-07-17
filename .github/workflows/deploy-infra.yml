@@ -87,5 +87,7 @@ jobs:
             # Жестко останавливаем старые контейнеры, если они зависли
             docker compose down --remove-orphans || true
             
+            if [ -z "$KEYCLOAK_ADMIN_PASS" ]; then echo "Ошибка: Пароль пустой!"; else echo "Пароль успешно передан"; fi
+            
             # Запускаем сборку заново
             docker compose up -d --build
