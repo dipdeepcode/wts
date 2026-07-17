@@ -49,10 +49,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+
             # Присваиваем значение в bash-переменную для удобства работы внутри скрипта
             cd "${{ vars.SERVER_INFRA_PATH }}"
 
-#            sed -i 's/\r$//' database/init_db.sh 2>/dev/null || true
+            #sed -i 's/\r$//' database/init_db.sh 2>/dev/null || true
 
             # Секреты для БД
             echo "POSTGRES_USER=${{ secrets.ROOT_DB_USER }}" > .env
