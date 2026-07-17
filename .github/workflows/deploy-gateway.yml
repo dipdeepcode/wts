@@ -77,4 +77,4 @@ jobs:
 
             # Ключевая команда: указываем имя конкретного сервиса 'gateway'
             # Docker Compose пересоберет только его Dockerfile и перезапустит один контейнер
-            docker compose --env-file ${{ env.ENV_FILENAME }} up -d --build gateway
+            docker compose --env-file infra.env --env-file ${{ env.ENV_FILENAME }} up -d --build gateway
