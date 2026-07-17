@@ -80,7 +80,7 @@ services:
       - db_net
       - iam_net
     extra_hosts:
-      - "auth.dipdeepcode.ru:host-gateway"
+      - "auth.dipdeepcode.ru:212.109.223.138"
     depends_on:
       database:
         condition: service_healthy
