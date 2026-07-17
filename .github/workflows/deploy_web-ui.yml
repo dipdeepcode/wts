@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - 'web-ui/**'
-#      - '.github/workflows/deploy_web-ui.yml'
+      - '.github/workflows/deploy_web-ui.yml'
 #  workflow_run:
 #    workflows: ["Deploy Gateway"]
 #    types:
