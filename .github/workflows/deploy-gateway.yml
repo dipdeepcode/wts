@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 1. Очищаем только папку gateway на сервере, оставляя базу и iam нетронутыми
       - name: Prepare Gateway Directory via SSH
