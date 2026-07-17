@@ -7,11 +7,10 @@ on:
     paths:
       - 'web-ui/**'
       - '.github/workflows/deploy_web-ui.yml'
-  # Автоматический запуск после успешного деплоя шлюза
-  workflow_run:
-    workflows: ["Deploy Gateway"]
-    types:
-      - completed
+#  workflow_run:
+#    workflows: ["Deploy Gateway"]
+#    types:
+#      - completed
 
 jobs:
   deploy:

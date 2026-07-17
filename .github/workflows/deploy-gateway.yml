@@ -7,10 +7,10 @@ on:
     paths:
       - 'gateway/**'
       - '.github/workflows/deploy-gateway.yml'
-  workflow_run:
-    workflows: ["Deploy Infrastructure (Postgres, Keycloak)"]
-    types:
-      - completed
+#  workflow_run:
+#    workflows: ["Deploy Infrastructure (Postgres, Keycloak)"]
+#    types:
+#      - completed
 
 jobs:
   deploy-gateway:
