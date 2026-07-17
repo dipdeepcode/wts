@@ -85,4 +85,4 @@ jobs:
             docker compose down --remove-orphans || true
             
             # Запускаем сборку заново
-            docker compose --env-file .env up -d --build
+            docker compose up -d --build database iam
