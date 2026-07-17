@@ -6,6 +6,7 @@ services:
       context: ./database
       dockerfile: Dockerfile
     image: dipdeepcode/wts-postgres:17.4-alpine
+    container_name: wts_postgres
     restart: unless-stopped
     shm_size: 128mb
     environment:
@@ -39,6 +40,7 @@ services:
       context: ./iam
       dockerfile: Dockerfile
     image: dipdeepcode/wts-keycloak:26.7.0
+    container_name: wts_keycloak
     restart: unless-stopped
     command: start --optimized
     environment:
@@ -67,6 +69,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     image: dipdeepcode/wts-gateway:latest
+    container_name: wts_gateway
     restart: unless-stopped
     environment:
       TZ: Europe/Moscow
