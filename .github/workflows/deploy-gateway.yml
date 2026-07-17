@@ -64,7 +64,7 @@ jobs:
             cd "${{ vars.SERVER_INFRA_PATH }}"
             
             # Экспортируем секрет для Spring Cloud Gateway
-            echo "GATEWAY_CLIENT_ID=${{ vars.GATEWAY_CLIENT_ID }}" > ${{ env.ENV_FILENAME }}
+            echo "GATEWAY_CLIENT_ID=${{ secrets.GATEWAY_CLIENT_ID }}" > ${{ env.ENV_FILENAME }}
             echo "GATEWAY_CLIENT_SECRET=${{ secrets.GATEWAY_CLIENT_SECRET }}" >> ${{ env.ENV_FILENAME }}
             
             # Переменные для подключения к базе сессий
