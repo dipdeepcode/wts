@@ -57,9 +57,33 @@ services:
       - "127.0.0.1:8085:8080"
     networks:
       - db_net
+      - iam_net
     depends_on:
       database:
         condition: service_healthy
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: dipdeepcode/wts-gateway:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Moscow
+      SESSIONS_DB_NAME: ${SESSIONS_DB_NAME}
+      SESSIONS_DB_USER: ${SESSIONS_DB_USER}
+      SESSIONS_DB_PASS: ${SESSIONS_DB_PASS}
+      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
+    ports:
+      - "127.0.0.1:8081:8080"
+    networks:
+      - db_net
+      - iam_net
+    depends_on:
+      database:
+        condition: service_healthy
+      iam:
+        condition: service_started
 
 volumes:
   db_vol:
@@ -68,3 +92,5 @@ volumes:
 networks:
   db_net:
     name: db_net
+  iam_net:
+    name: iam_net
