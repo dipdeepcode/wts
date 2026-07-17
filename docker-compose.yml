@@ -79,6 +79,8 @@ services:
     networks:
       - db_net
       - iam_net
+    extra_hosts:
+      - "auth.dipdeepcode.ru:host-gateway"
     depends_on:
       database:
         condition: service_healthy

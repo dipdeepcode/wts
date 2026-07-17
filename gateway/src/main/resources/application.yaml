@@ -11,7 +11,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://iam:8080/realms/WTS
+            issuer-uri: https://auth.dipdeepcode.ru/realms/WTS
         registration:
           keycloak:
             provider: keycloak
