@@ -4,7 +4,7 @@ services:
     build:
       context: ./gateway
       dockerfile: Dockerfile
-    image: dipdeepcode/wts-gateway:latest
+    image: ${IMAGE}
     container_name: wts_gateway
     restart: unless-stopped
     environment:
