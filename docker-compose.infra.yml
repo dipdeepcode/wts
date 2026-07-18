@@ -1,11 +1,7 @@
 services:
 
   database:
-    build:
-      context: ./database
-      dockerfile: Dockerfile
     image: dipdeepcode/wts-postgres:17.4-alpine
-    container_name: wts_postgres
     restart: unless-stopped
     shm_size: 128mb
     environment:
@@ -35,11 +31,7 @@ services:
       start_period: 5s
 
   iam:
-    build:
-      context: ./iam
-      dockerfile: Dockerfile
     image: dipdeepcode/wts-keycloak:26.7.0
-    container_name: wts_keycloak
     restart: unless-stopped
     command: start --optimized
     environment:
@@ -51,7 +43,7 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASS}
       KC_PROXY_HEADERS: xforwarded
-      KC_HOSTNAME: ${KC_HOSTNAME:-localhost}
+      KC_HOSTNAME: ${KC_HOSTNAME}
       KC_HTTP_ENABLED: true
       KC_CACHE: local
     ports:
