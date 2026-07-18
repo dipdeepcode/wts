@@ -42,7 +42,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v7
         with:
-          context: .
+          context: ./gateway
           push: true
           tags: ${{ env.IMAGE }}
           cache-from: type=gha
