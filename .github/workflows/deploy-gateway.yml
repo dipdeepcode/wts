@@ -12,8 +12,6 @@ on:
     types:
       - completed
 permissions: {}
-env:
-  ENV_FILENAME: gateway.env
 
 jobs:
   deploy-gateway:
@@ -55,26 +53,22 @@ jobs:
       # 3. Пересобираем и перезапускаем ТОЛЬКО контейнер gateway
       - name: Rebuild and Restart Gateway via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GATEWAY_CLIENT_ID: ${{ secrets.GATEWAY_CLIENT_ID }}
+          GATEWAY_CLIENT_SECRET: ${{ secrets.GATEWAY_CLIENT_SECRET }}
+          SESSIONS_DB_NAME: ${{ vars.SESSIONS_DB_NAME }}
+          SESSIONS_DB_USER: ${{ secrets.SESSIONS_DB_USER }}
+          SESSIONS_DB_PASS: ${{ secrets.SESSIONS_DB_PASS }}
+          FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+          KC_HOSTNAME: ${{ vars.KC_HOSTNAME }}
+          KC_REALM_NAME: ${{ vars.KC_REALM_NAME }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          envs: GATEWAY_CLIENT_ID,GATEWAY_CLIENT_SECRET,SESSIONS_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,FRONTEND_URL,KC_HOSTNAME,KC_REALM_NAME
           script: |
             cd "${{ vars.SERVER_INFRA_PATH }}"
             
-            # Экспортируем секрет для Spring Cloud Gateway
-            echo "GATEWAY_CLIENT_ID=${{ secrets.GATEWAY_CLIENT_ID }}" > ${{ env.ENV_FILENAME }}
-            echo "GATEWAY_CLIENT_SECRET=${{ secrets.GATEWAY_CLIENT_SECRET }}" >> ${{ env.ENV_FILENAME }}
-            
-            # Переменные для подключения к базе сессий
-            echo "SESSIONS_DB_NAME=${{ vars.SESSIONS_DB_NAME }}" >> ${{ env.ENV_FILENAME }}
-            echo "SESSIONS_DB_USER=${{ secrets.SESSIONS_DB_USER }}" >> ${{ env.ENV_FILENAME }}
-            echo "SESSIONS_DB_PASS=${{ secrets.SESSIONS_DB_PASS }}" >> ${{ env.ENV_FILENAME }}
-            echo "FRONTEND_URL=${{ vars.FRONTEND_URL }}" >> ${{ env.ENV_FILENAME }}
-            echo "KC_HOSTNAME=${{ vars.KC_HOSTNAME }}" >> ${{ env.ENV_FILENAME }}
-            echo "KC_REALM_NAME=${{ vars.KC_REALM_NAME }}" >> ${{ env.ENV_FILENAME }}
-
-            # Ключевая команда: указываем имя конкретного сервиса 'gateway'
-            # Docker Compose пересоберет только его Dockerfile и перезапустит один контейнер
-            docker compose --env-file ${{ env.ENV_FILENAME }} up -d --build --no-deps gateway
+            docker compose up -d --build gateway
