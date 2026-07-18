@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "docker-compose.yml,database/**,iam/**"
+          source: "docker-compose.infra.yml,database/**,iam/**"
           target: "${{ vars.SERVER_INFRA_PATH }}"
 
       # 3. Запуск инфраструктуры с прямой передачей переменных
