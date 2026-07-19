@@ -85,21 +85,20 @@ jobs:
           KC_HOSTNAME: ${{ vars.KC_HOSTNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          POSTGRES_IMAGE: ${{ env.POSTGRES_IMAGE }}
+          KEYCLOAK_IMAGE: ${{ env.KEYCLOAK_IMAGE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: POSTGRES_USER,POSTGRES_PASS,IAM_DB_USER,IAM_DB_PASS,IAM_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,SESSIONS_DB_NAME,BACKEND_DB_USER,BACKEND_DB_PASS,BACKEND_DB_NAME,KEYCLOAK_ADMIN_USER,KEYCLOAK_ADMIN_PASS,KC_HOSTNAME,DOCKERHUB_TOKEN,DOCKERHUB_USERNAME
+          envs: POSTGRES_USER,POSTGRES_PASS,IAM_DB_USER,IAM_DB_PASS,IAM_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,SESSIONS_DB_NAME,BACKEND_DB_USER,BACKEND_DB_PASS,BACKEND_DB_NAME,KEYCLOAK_ADMIN_USER,KEYCLOAK_ADMIN_PASS,KC_HOSTNAME,DOCKERHUB_TOKEN,DOCKERHUB_USERNAME,POSTGRES_IMAGE,KEYCLOAK_IMAGE
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
 
             # Создаем сети, если их нет
             docker network create db_net 2>/dev/null || true
             docker network create iam_net 2>/dev/null || true
-            
-            # Логинимся на VDS в Docker Hub для скачивания свежих приватных образов
-            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             
             # Скачиваем новые версии образов, которые только что собрал GitHub
             docker compose -f docker-compose.infra.yml pull
