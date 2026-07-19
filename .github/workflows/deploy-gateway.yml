@@ -78,7 +78,6 @@ jobs:
           envs: GATEWAY_CLIENT_ID,GATEWAY_CLIENT_SECRET,SESSIONS_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,FRONTEND_URL,KC_HOSTNAME,KC_REALM_NAME,GATEWAY_IMAGE
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker compose pull gateway
             docker compose up -d --no-deps gateway
             docker image prune -f
