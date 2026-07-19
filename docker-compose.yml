@@ -1,10 +1,9 @@
+name: wts
+
 services:
 
   gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-    image: ${IMAGE}
+    image: ${GATEWAY_IMAGE}
     container_name: wts_gateway
     restart: unless-stopped
     environment:

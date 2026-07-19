@@ -13,7 +13,7 @@ on:
       - completed
 permissions: {}
 env:
-  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_gateway:latest
+  GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_gateway:latest
 
 jobs:
   deploy-gateway:
@@ -44,7 +44,7 @@ jobs:
         with:
           context: ./gateway
           push: true
-          tags: ${{ env.IMAGE }}
+          tags: ${{ env.GATEWAY_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -56,7 +56,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "docker-compose.yml"
-          target: "${{ vars.SERVER_INFRA_PATH }}"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
 
       - name: Deploy to VDS via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -69,15 +69,15 @@ jobs:
           FRONTEND_URL: ${{ vars.FRONTEND_URL }}
           KC_HOSTNAME: ${{ vars.KC_HOSTNAME }}
           KC_REALM_NAME: ${{ vars.KC_REALM_NAME }}
-          IMAGE: ${{ env.IMAGE }}
+          GATEWAY_IMAGE: ${{ env.GATEWAY_IMAGE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: GATEWAY_CLIENT_ID,GATEWAY_CLIENT_SECRET,SESSIONS_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,FRONTEND_URL,KC_HOSTNAME,KC_REALM_NAME,IMAGE
+          envs: GATEWAY_CLIENT_ID,GATEWAY_CLIENT_SECRET,SESSIONS_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,FRONTEND_URL,KC_HOSTNAME,KC_REALM_NAME,GATEWAY_IMAGE
           script: |
-            cd "${{ vars.SERVER_INFRA_PATH }}"
+            cd "${{ vars.SERVER_PROJECT_PATH }}"
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker compose pull gateway
             docker compose up -d --no-deps gateway
