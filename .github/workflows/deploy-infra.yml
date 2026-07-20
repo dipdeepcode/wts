@@ -62,7 +62,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "docker-compose.infra.yml"
+          source: "docker-compose.yml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
 
 
@@ -101,10 +101,10 @@ jobs:
             docker network create iam_net 2>/dev/null || true
             
             # Скачиваем новые версии образов, которые только что собрал GitHub
-            docker compose -f docker-compose.infra.yml pull
+            docker compose -f docker-compose.yml pull database iam
             
             # Перезапускаем контейнеры (флаг --build убран, так как сборка больше не нужна)
-            docker compose -f docker-compose.infra.yml up -d --remove-orphans
+            docker compose -f docker-compose.yml up -d --remove-orphans database iam
             
             # Чистим старые неиспользуемые слои образов на VDS
             docker image prune -f
