@@ -97,16 +97,6 @@ jobs:
           envs: POSTGRES_USER,POSTGRES_PASS,IAM_DB_USER,IAM_DB_PASS,IAM_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,SESSIONS_DB_NAME,BACKEND_DB_USER,BACKEND_DB_PASS,BACKEND_DB_NAME,KEYCLOAK_ADMIN_USER,KEYCLOAK_ADMIN_PASS,KC_HOSTNAME,DOCKERHUB_TOKEN,DOCKERHUB_USERNAME,POSTGRES_IMAGE,KEYCLOAK_IMAGE,GATEWAY_IMAGE
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-
-            # Создаем сети, если их нет
-            docker network create db_net 2>/dev/null || true
-            docker network create iam_net 2>/dev/null || true
-            
-            # Скачиваем новые версии образов, которые только что собрал GitHub
             docker compose pull database iam
-            
-            # Перезапускаем контейнеры (флаг --build убран, так как сборка больше не нужна)
             docker compose up -d --remove-orphans database iam
-            
-            # Чистим старые неиспользуемые слои образов на VDS
             docker image prune -f
