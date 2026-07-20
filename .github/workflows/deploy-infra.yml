@@ -101,7 +101,7 @@ jobs:
             docker network create iam_net 2>/dev/null || true
             
             # Скачиваем новые версии образов, которые только что собрал GitHub
-            docker compose -f docker-compose.yml pull database iam
+            docker compose -f docker-compose.yml pull
             
             # Перезапускаем контейнеры (флаг --build убран, так как сборка больше не нужна)
             docker compose -f docker-compose.yml up -d --remove-orphans database iam
