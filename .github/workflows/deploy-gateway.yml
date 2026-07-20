@@ -13,6 +13,8 @@ on:
       - completed
 permissions: {}
 env:
+  POSTGRES_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_postgres:17.4-alpine
+  KEYCLOAK_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_keycloak:26.7.0
   GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_gateway:latest
 
 jobs:
@@ -69,6 +71,8 @@ jobs:
           FRONTEND_URL: ${{ vars.FRONTEND_URL }}
           KC_HOSTNAME: ${{ vars.KC_HOSTNAME }}
           KC_REALM_NAME: ${{ vars.KC_REALM_NAME }}
+          POSTGRES_IMAGE: ${{ env.POSTGRES_IMAGE }}
+          KEYCLOAK_IMAGE: ${{ env.KEYCLOAK_IMAGE }}
           GATEWAY_IMAGE: ${{ env.GATEWAY_IMAGE }}
         with:
           host: ${{ secrets.SSH_HOST }}
