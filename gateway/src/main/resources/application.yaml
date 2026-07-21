@@ -28,7 +28,7 @@ spring:
     jdbc:
       initialize-schema: always
   datasource:
-    url: jdbc:postgresql://database:5432/${SESSIONS_DB_NAME}
+    url: jdbc:postgresql://rdbms:5432/${SESSIONS_DB_NAME}
     username: ${SESSIONS_DB_USER}
     password: ${SESSIONS_DB_PASS}
     driver-class-name: org.postgresql.Driver
