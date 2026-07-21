@@ -23,6 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
+    defaults:
+      run:
+        working-directory: web-ui
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
