@@ -40,7 +40,7 @@ services:
     environment:
       TZ: Europe/Moscow
       KC_DB: postgres
-      KC_DB_URL_HOST: database
+      KC_DB_URL_HOST: rdbms
       KC_DB_URL_DATABASE: ${IAM_DB_NAME}
       KC_DB_USERNAME: ${IAM_DB_USER}
       KC_DB_PASSWORD: ${IAM_DB_PASS}
