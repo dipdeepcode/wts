@@ -8,7 +8,7 @@ spring:
   application:
     name: tasks-service
   datasource:
-    url: jdbc:postgresql://database:5432/${TASKS_SERVICE_DB_NAME}
+    url: jdbc:postgresql://rdbms:5432/${TASKS_SERVICE_DB_NAME}
     username: ${TASKS_SERVICE_DB_USER}
     password: ${TASKS_SERVICE_DB_PASS}
     driver-class-name: org.postgresql.Driver
