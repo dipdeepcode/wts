@@ -1,12 +1,12 @@
-name: Deploy Gateway
+name: Deploy Tasks-service
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'gateway/**'
-      - '.github/workflows/deploy-gateway.yml'
+      - 'tasks-service/**'
+      - '.github/workflows/deploy-tasks-service.yml'
   workflow_run:
     workflows:
       - "Deploy Infrastructure (Postgres, Keycloak)"
@@ -34,7 +34,7 @@ jobs:
           echo "tasks=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.tasks' .github/config/images.json)" >> $GITHUB_OUTPUT
 
   deploy:
-    name: Deploy gateway
+    name: Deploy tasks-service
     needs: load-env
     environment: production
     permissions:
@@ -66,9 +66,9 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v7
         with:
-          context: ./gateway
+          context: ./tasks-service
           push: true
-          tags: ${{ env.GATEWAY_IMAGE }}
+          tags: ${{ env.TASKS_SERVICE_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -97,14 +97,16 @@ jobs:
             export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
             export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
 
-            export GATEWAY_CLIENT_ID="${{ secrets.GATEWAY_CLIENT_ID }}"
-            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
-            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
-            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
-            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
-            export FRONTEND_URL="${{ vars.FRONTEND_URL }}"
+            export TASKS_SERVICE_DB_NAME="${{ vars.TASKS_SERVICE_DB_NAME }}"
+            export TASKS_SERVICE_DB_USER="${{ secrets.TASKS_SERVICE_DB_USER }}"
+            export TASKS_SERVICE_DB_PASS="${{ secrets.TASKS_SERVICE_DB_PASS }}"
             export IAM_ISSUER_URI="${{ env.IAM_ISSUER_URI }}"
 
-            docker compose pull gateway
-            docker compose up -d --no-deps gateway
+            docker compose pull tasks-service
+            docker compose up -d --no-deps tasks-service
             docker image prune -f
+
+
+
+
+

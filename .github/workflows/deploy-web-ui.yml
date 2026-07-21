@@ -6,18 +6,13 @@ on:
       - master
     paths:
       - 'web-ui/**'
-      - '.github/workflows/deploy_web-ui.yml'
-#  workflow_run:
-#    workflows: ["Deploy Gateway"]
-#    types:
-#      - completed
+      - '.github/workflows/deploy-web-ui.yml'
 
 jobs:
   deploy:
     environment: production
     runs-on: ubuntu-latest
 
-    # Запускаем только при пуше или если шлюз деплоился и завершился успехом
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     defaults:

@@ -2,18 +2,38 @@ name: Deploy Infrastructure (Postgres, Keycloak)
 
 on: workflow_dispatch
 permissions: {}
-env:
-  POSTGRES_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_postgres:17.4-alpine
-  KEYCLOAK_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_keycloak:26.7.0
-  GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_gateway:latest
 
 jobs:
-  deploy-infra:
+  load-env:
+    name: Load Images Config
+    runs-on: ubuntu-22.04
+    outputs:
+      rdbms: ${{ steps.set-config.outputs.rdbms }}
+      iam: ${{ steps.set-config.outputs.iam }}
+      gateway: ${{ steps.set-config.outputs.gateway }}
+      tasks: ${{ steps.set-config.outputs.tasks }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - id: set-config
+        run: |
+          echo "rdbms=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.rdbms' .github/config/images.json)" >> $GITHUB_OUTPUT
+          echo "iam=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.iam' .github/config/images.json)" >> $GITHUB_OUTPUT
+          echo "gateway=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.gateway' .github/config/images.json)" >> $GITHUB_OUTPUT
+          echo "tasks=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.tasks' .github/config/images.json)" >> $GITHUB_OUTPUT
+
+  deploy:
     name: Deploy infrastructure
+    needs: load-env
     environment: production
     runs-on: ubuntu-22.04
     permissions:
       contents: read
+    env:
+      RDBMS_IMAGE: ${{ needs.load-env.outputs.rdbms }}
+      IAM_IMAGE: ${{ needs.load-env.outputs.iam }}
+      GATEWAY_IMAGE: ${{ needs.load-env.outputs.gateway }}
+      TASKS_SERVICE_IMAGE: ${{ needs.load-env.outputs.tasks }}
 
     steps:
       - name: Checkout repository
@@ -31,9 +51,9 @@ jobs:
       - name: Build and Push Postgres Image
         uses: docker/build-push-action@v7
         with:
-          context: ./database
+          context: ./rdbms
           push: true
-          tags: ${{ env.POSTGRES_IMAGE }}
+          tags: ${{ env.RDBMS_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -42,7 +62,7 @@ jobs:
         with:
           context: ./iam
           push: true
-          tags: ${{ env.KEYCLOAK_IMAGE }}
+          tags: ${{ env.IAM_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -66,37 +86,37 @@ jobs:
           source: "docker-compose.yml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
 
-
-      - name: Pull and Start Infrastructure via SSH
+      - name: Deploy to VDS
         uses: appleboy/ssh-action@v1.0.3
-        env:
-          POSTGRES_USER: ${{ secrets.ROOT_DB_USER }}
-          POSTGRES_PASS: ${{ secrets.ROOT_DB_PASS }}
-          IAM_DB_USER: ${{ secrets.IAM_DB_USER }}
-          IAM_DB_PASS: ${{ secrets.IAM_DB_PASS }}
-          IAM_DB_NAME: ${{ vars.IAM_DB_NAME }}
-          SESSIONS_DB_USER: ${{ secrets.SESSIONS_DB_USER }}
-          SESSIONS_DB_PASS: ${{ secrets.SESSIONS_DB_PASS }}
-          SESSIONS_DB_NAME: ${{ vars.SESSIONS_DB_NAME }}
-          BACKEND_DB_USER: ${{ secrets.BACKEND_DB_USER }}
-          BACKEND_DB_PASS: ${{ secrets.BACKEND_DB_PASS }}
-          BACKEND_DB_NAME: ${{ vars.BACKEND_DB_NAME }}
-          KEYCLOAK_ADMIN_USER: ${{ secrets.KEYCLOAK_ADMIN_USER }}
-          KEYCLOAK_ADMIN_PASS: ${{ secrets.KEYCLOAK_ADMIN_PASS }}
-          KC_HOSTNAME: ${{ vars.KC_HOSTNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          POSTGRES_IMAGE: ${{ env.POSTGRES_IMAGE }}
-          KEYCLOAK_IMAGE: ${{ env.KEYCLOAK_IMAGE }}
-          GATEWAY_IMAGE: ${{ env.GATEWAY_IMAGE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: POSTGRES_USER,POSTGRES_PASS,IAM_DB_USER,IAM_DB_PASS,IAM_DB_NAME,SESSIONS_DB_USER,SESSIONS_DB_PASS,SESSIONS_DB_NAME,BACKEND_DB_USER,BACKEND_DB_PASS,BACKEND_DB_NAME,KEYCLOAK_ADMIN_USER,KEYCLOAK_ADMIN_PASS,KC_HOSTNAME,DOCKERHUB_TOKEN,DOCKERHUB_USERNAME,POSTGRES_IMAGE,KEYCLOAK_IMAGE,GATEWAY_IMAGE
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-            docker compose pull database iam
-            docker compose up -d --remove-orphans database iam
+
+            export RDBMS_IMAGE="${{ env.RDBMS_IMAGE }}"
+            export IAM_IMAGE="${{ env.IAM_IMAGE }}"
+            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
+            export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
+
+            export ROOT_DB_NAME="${{ vars.ROOT_DB_NAME }}"
+            export ROOT_DB_USER="${{ secrets.ROOT_DB_USER }}"
+            export ROOT_DB_PASS="${{ secrets.ROOT_DB_PASS }}"
+            export IAM_DB_NAME="${{ vars.IAM_DB_NAME }}"
+            export IAM_DB_USER="${{ secrets.IAM_DB_USER }}"
+            export IAM_DB_PASS="${{ secrets.IAM_DB_PASS }}"
+            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
+            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
+            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
+            export TASKS_SERVICE_DB_NAME="${{ vars.TASKS_SERVICE_DB_NAME }}"
+            export TASKS_SERVICE_DB_USER="${{ secrets.TASKS_SERVICE_DB_USER }}"
+            export TASKS_SERVICE_DB_PASS="${{ secrets.TASKS_SERVICE_DB_PASS }}"
+            export KEYCLOAK_ADMIN_USER="${{ secrets.KEYCLOAK_ADMIN_USER }}"
+            export KEYCLOAK_ADMIN_PASS="${{ secrets.KEYCLOAK_ADMIN_PASS }}"
+            export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
+
+            docker compose pull rdbms iam
+            docker compose up -d --remove-orphans rdbms iam
             docker image prune -f

@@ -1,0 +1,24 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+permissions: {}
+env:
+  RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_postgres:17.4-alpine
+  IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_keycloak:26.7.0
+  GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_gateway:latest
+  TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/wts_tasks_service:latest
+
+jobs:
+  deploy:
+    name: Deploy
+    environment: production
+    permissions:
+      contents: read
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7

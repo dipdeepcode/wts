@@ -1,0 +1,40 @@
+server:
+  port: 8080
+  ssl:
+    enabled: false
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: tasks-service
+  datasource:
+    url: jdbc:postgresql://database:5432/${TASKS_SERVICE_DB_NAME}
+    username: ${TASKS_SERVICE_DB_USER}
+    password: ${TASKS_SERVICE_DB_PASS}
+    driver-class-name: org.postgresql.Driver
+  data:
+    rest:
+      base-path: /api/v1
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+
+com:
+  c4-soft:
+    springaddons:
+      oidc:
+        ops:
+          - iss: ${IAM_ISSUER_URI}
+            username-claim: $.preferred_username
+            authorities:
+              - path: $.realm_access.roles
+              - path: $.resource_access.*.roles
+        resourceserver:
+          permit-all:
+            - /api/me

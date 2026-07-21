@@ -1,0 +1,6 @@
+{
+  "rdbms": "wts_postgres:17.4-alpine",
+  "iam": "wts_keycloak:26.7.0",
+  "gateway": "wts_gateway:latest",
+  "tasks": "wts_tasks_service:latest"
+}

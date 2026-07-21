@@ -2,44 +2,46 @@ name: wts
 
 services:
 
-  database:
-    image: ${POSTGRES_IMAGE}
+  rdbms:
+    image: ${RDBMS_IMAGE}
     restart: unless-stopped
     shm_size: 128mb
     environment:
       TZ: Europe/Moscow
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      POSTGRES_DB: ${ROOT_DB_NAME}
+      POSTGRES_USER: ${ROOT_DB_USER}
+      POSTGRES_PASSWORD: ${ROOT_DB_PASS}
+      IAM_DB_NAME: ${IAM_DB_NAME}
       IAM_DB_USER: ${IAM_DB_USER}
       IAM_DB_PASS: ${IAM_DB_PASS}
-      IAM_DB_NAME: ${IAM_DB_NAME}
+      SESSIONS_DB_NAME: ${SESSIONS_DB_NAME}
       SESSIONS_DB_USER: ${SESSIONS_DB_USER}
       SESSIONS_DB_PASS: ${SESSIONS_DB_PASS}
-      SESSIONS_DB_NAME: ${SESSIONS_DB_NAME}
+      BACKEND_DB_NAME: ${BACKEND_DB_NAME}
       BACKEND_DB_USER: ${BACKEND_DB_USER}
       BACKEND_DB_PASS: ${BACKEND_DB_PASS}
-      BACKEND_DB_NAME: ${BACKEND_DB_NAME}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - db_vol:/var/lib/postgresql/data
+      - rdbms_vol
     networks:
-      - db_net
+      - rdbms_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U $${ROOT_DB_USER} -d $${ROOT_DB_NAME}"]
       interval: 10s
       timeout: 3s
       retries: 3
       start_period: 5s
 
   iam:
-    image: ${KEYCLOAK_IMAGE}
+    image: ${IAM_IMAGE}
     restart: unless-stopped
     command: start --optimized
     environment:
       TZ: Europe/Moscow
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://database:5432/${IAM_DB_NAME}
+      KC_DB_URL_HOST: database
+      KC_DB_URL_DATABASE: ${IAM_DB_NAME}
       KC_DB_USERNAME: ${IAM_DB_USER}
       KC_DB_PASSWORD: ${IAM_DB_PASS}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
@@ -51,7 +53,7 @@ services:
     ports:
       - "127.0.0.1:8085:8080"
     networks:
-      - db_net
+      - rdbms_net
       - iam_net
     healthcheck:
       test: ["CMD-SHELL", "curl --head -fsS http://localhost:9000/health/ready | echo $?"]
@@ -60,7 +62,7 @@ services:
       retries: 5
       start_period: 40s
     depends_on:
-      database:
+      rdbms:
         condition: service_healthy
 
   gateway:
@@ -74,29 +76,51 @@ services:
       GATEWAY_CLIENT_ID: ${GATEWAY_CLIENT_ID}
       GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
       FRONTEND_URL: ${FRONTEND_URL}
-      KC_HOSTNAME: ${KC_HOSTNAME}
-      KC_REALM_NAME: ${KC_REALM_NAME}
+      IAM_ISSUER_URI: ${IAM_ISSUER_URI}
     ports:
       - "127.0.0.1:8081:8080"
     networks:
-      - db_net
+      - rdbms_net
       - iam_net
+      - tasks-service_net
     extra_hosts:
       - "auth.dipdeepcode.ru:212.109.223.138"
     depends_on:
-      database:
+      rdbms:
         condition: service_healthy
       iam:
         condition: service_healthy
 
+  tasks-service:
+    image: ${TASKS_SERVICE_IMAGE}
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Moscow
+      TASKS_SERVICE_DB_NAME: ${TASKS_SERVICE_DB_NAME}
+      TASKS_SERVICE_DB_USER: ${TASKS_SERVICE_DB_USER}
+      TASKS_SERVICE_DB_PASS: ${TASKS_SERVICE_DB_PASS}
+      IAM_ISSUER_URI: ${IAM_ISSUER_URI}
+    networks:
+      - rdbms_net
+      - iam_net
+      - tasks-service_net
+    extra_hosts:
+      - "auth.dipdeepcode.ru:host-gateway"
+    depends_on:
+      rdbms:
+        condition: service_healthy
+
 volumes:
-  db_vol:
-    name: db_vol
+  rdbms_vol:
+    name: rdbms_vol
 
 networks:
-  db_net:
-    name: db_net
+  rdbms_net:
+    name: rdbms_net
     driver: bridge
   iam_net:
     name: iam_net
+    driver: bridge
+  tasks-service_net:
+    name: tasks-service_net
     driver: bridge

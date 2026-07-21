@@ -11,7 +11,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: ${KC_HOSTNAME}/realms/${KC_REALM_NAME}
+            issuer-uri: ${IAM_ISSUER_URI}
         registration:
           keycloak:
             provider: keycloak
@@ -38,7 +38,7 @@ com:
     springaddons:
       oidc:
         ops:
-          - iss: ${KC_HOSTNAME}/realms/${KC_REALM_NAME}
+          - iss: ${IAM_ISSUER_URI}
             aud: ${GATEWAY_CLIENT_ID}
         client:
           # Внешний адрес вашего фронтенда Angular
