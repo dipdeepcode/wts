@@ -4,36 +4,17 @@ on: workflow_dispatch
 permissions: {}
 
 jobs:
-  load-env:
-    name: Load Images Config
-    runs-on: ubuntu-22.04
-    outputs:
-      rdbms: ${{ steps.set-config.outputs.rdbms }}
-      iam: ${{ steps.set-config.outputs.iam }}
-      gateway: ${{ steps.set-config.outputs.gateway }}
-      tasks: ${{ steps.set-config.outputs.tasks }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-      - id: set-config
-        run: |
-          echo "rdbms=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.rdbms' .github/config/images.json)" >> $GITHUB_OUTPUT
-          echo "iam=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.iam' .github/config/images.json)" >> $GITHUB_OUTPUT
-          echo "gateway=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.gateway' .github/config/images.json)" >> $GITHUB_OUTPUT
-          echo "tasks=${{ secrets.DOCKERHUB_USERNAME }}/$(jq -r '.tasks' .github/config/images.json)" >> $GITHUB_OUTPUT
-
   deploy:
     name: Deploy infrastructure
-    needs: load-env
     environment: production
     runs-on: ubuntu-22.04
     permissions:
       contents: read
     env:
-      RDBMS_IMAGE: ${{ needs.load-env.outputs.rdbms }}
-      IAM_IMAGE: ${{ needs.load-env.outputs.iam }}
-      GATEWAY_IMAGE: ${{ needs.load-env.outputs.gateway }}
-      TASKS_SERVICE_IMAGE: ${{ needs.load-env.outputs.tasks }}
+      RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
+      IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
+      GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
+      TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
 
     steps:
       - name: Checkout repository

@@ -7,21 +7,25 @@ on:
     paths:
       - 'web-ui/**'
       - '.github/workflows/deploy-web-ui.yml'
+  workflow_run:
+    workflows:
+      - "Deploy Infrastructure (Postgres, Keycloak)"
+    types:
+      - completed
+permissions: {}
 
 jobs:
   deploy:
+    name: Deploy web-ui
     environment: production
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
-
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
-
-    defaults:
-      run:
-        working-directory: web-ui
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -36,8 +40,8 @@ jobs:
       - name: Build application
         run: npm run build -- --configuration=production
 
-      - name: Deploy to VDS via SSH
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy to VDS
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
