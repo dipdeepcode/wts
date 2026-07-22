@@ -31,13 +31,15 @@ export class LoginComponent implements OnInit {
     }
 
     try {
-      const loginUrl = new URL(loginOptions.loginUri, window.location.origin);
-      loginUrl.searchParams.append(
-        'post_login_success_uri', `http://dipdeepcode.ru/${ROUTES_CONSTANTS.workspaces}`,
-      );
-      loginUrl.searchParams.append(
-        'post_login_failure_uri', 'http://dipdeepcode.ru'
-      );
+      const baseUri = window.location.origin;
+      const loginUrl = new URL(loginOptions.loginUri, baseUri);
+
+      const successUrl = new URL(ROUTES_CONSTANTS.workspaces, baseUri);
+      const failureUrl = new URL('/', baseUri);
+
+      loginUrl.searchParams.append('post_login_success_uri', successUrl.toString());
+      loginUrl.searchParams.append('post_login_failure_uri', failureUrl.toString());
+
       window.location.href = loginUrl.toString();
     } catch (e) {
       this.toast.show('Invalid Login URI');
