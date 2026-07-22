@@ -67,7 +67,7 @@ services:
       rdbms:
         condition: service_healthy
     volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./iam/realm-export.json:/opt/keycloak/data/import/realm-export.json
 
   gateway:
     image: ${GATEWAY_IMAGE}
