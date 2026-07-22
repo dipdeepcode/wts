@@ -32,6 +32,19 @@ spring:
     username: ${SESSIONS_DB_USER}
     password: ${SESSIONS_DB_PASS}
     driver-class-name: org.postgresql.Driver
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: tasks-service
+              uri: http://tasks-service:8080/
+              predicates:
+                - Path=/api, /api/**
+              filters:
+                - TokenRelay=
+                - RemoveRequestHeader=Cookie
+                - AddRequestHeader=X-Forwarded-Host, dipdeepcode.ru
 
 com:
   c4-soft:
