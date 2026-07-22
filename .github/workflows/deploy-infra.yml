@@ -82,6 +82,9 @@ jobs:
             export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
             export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
 
+            export GATEWAY_CLIENT_ID="${{ secrets.GATEWAY_CLIENT_ID }}"
+            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
+
             export ROOT_DB_NAME="${{ vars.ROOT_DB_NAME }}"
             export ROOT_DB_USER="${{ secrets.ROOT_DB_USER }}"
             export ROOT_DB_PASS="${{ secrets.ROOT_DB_PASS }}"
