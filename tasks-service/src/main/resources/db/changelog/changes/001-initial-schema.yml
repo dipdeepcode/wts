@@ -1,0 +1,108 @@
+databaseChangeLog:
+  # Изменения для таблицы workspaces
+  - changeSet:
+      id: 1-create-workspaces
+      author: dipdeepcode
+      changes:
+        - createTable:
+            tableName: workspaces
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_workspace
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: order_by
+                  type: INT
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+        - createIndex:
+            indexName: idx_workspace_created_by
+            tableName: workspaces
+            columns:
+              - column:
+                  name: created_by
+
+  # Изменения для таблицы tasks
+  - changeSet:
+      id: 2-create-tasks
+      author: dipdeepcode
+      changes:
+        - createTable:
+            tableName: tasks
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_task
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: summary
+                  type: VARCHAR(255)
+              - column:
+                  name: due_date
+                  type: DATE
+              - column:
+                  name: order_by
+                  type: INT
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: workspace_id
+                  type: BIGINT
+        - createIndex:
+            indexName: idx_task_created_by
+            tableName: tasks
+            columns:
+              - column:
+                  name: created_by
+        - addForeignKeyConstraint:
+            baseTableName: tasks
+            baseColumnNames: workspace_id
+            constraintName: fk_task_workspace
+            referencedTableName: workspaces
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  # Изменения для таблицы файлов (ElementCollection)
+  - changeSet:
+      id: 3-create-files
+      author: dipdeepcode
+      changes:
+        - createTable:
+            tableName: files
+            columns:
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: filename
+                  type: VARCHAR(255)
+        - addForeignKeyConstraint:
+            baseTableName: files
+            baseColumnNames: task_id
+            constraintName: fk_files_task
+            referencedTableName: tasks
+            referencedColumnNames: id
+            onDelete: CASCADE
