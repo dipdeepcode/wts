@@ -36,7 +36,7 @@ services:
   iam:
     image: ${IAM_IMAGE}
     restart: unless-stopped
-    command: start --optimized
+    command: start --optimized --import-realm
     environment:
       TZ: Europe/Moscow
       KC_DB: postgres
@@ -50,6 +50,8 @@ services:
       KC_HOSTNAME: ${KC_HOSTNAME}
       KC_HTTP_ENABLED: true
       KC_CACHE: local
+      GATEWAY_CLIENT_ID: ${GATEWAY_CLIENT_ID}
+      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
     ports:
       - "127.0.0.1:8085:8080"
     networks:
@@ -64,6 +66,8 @@ services:
     depends_on:
       rdbms:
         condition: service_healthy
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
 
   gateway:
     image: ${GATEWAY_IMAGE}
