@@ -57,10 +57,10 @@ com:
           # Внешний адрес вашего фронтенда Angular
           client-uri: ${FRONTEND_URL}
           post-login-allowed-uri-patterns:
-            - ${FRONTEND_URL}/workspaces
-            - ${FRONTEND_URL}
+            - ${FRONTEND_URL}/workspaces.*
+            - ${FRONTEND_URL}/?
           post-logout-allowed-uri-patterns:
-            - ${FRONTEND_URL}
+            - ${FRONTEND_URL}/?
           security-matchers:
             - /login/**
             - /oauth2/**
