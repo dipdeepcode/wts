@@ -1,0 +1,13 @@
+<app-manage-layout [layoutHeader]="layoutHeader()" [showMenu]="true">
+  <ul id="tasks">
+    @if (tasks().length > 0) {
+      @for (task of tasks(); track $index) {
+        <app-task [task]="task" (deleteClickEvent)="onDeleteClick($event)"></app-task>
+      }
+    } @else {
+      <div>
+        <p>There is no Tasks yet. Create new one.</p>
+      </div>
+    }
+  </ul>
+</app-manage-layout>

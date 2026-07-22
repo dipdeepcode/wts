@@ -1,0 +1,13 @@
+<section id="workspace-form">
+  <header>
+    <h2>{{ layoutHeader() }}</h2>
+    @if (showMenu()) {
+      <menu>
+        <a [routerLink]="newTaskLink">Add Task</a>
+      </menu>
+    }
+  </header>
+
+  <ng-content />
+
+</section>

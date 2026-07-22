@@ -1,0 +1,12 @@
+<div>
+  <article>
+    <h2>{{ task().title }}</h2>
+      <time>{{ task().dueDate | date : "fullDate" }}</time>
+    <p>{{ task().summary }}</p>
+      <p class="actions">
+        <button (click)="onComplete()">Complete</button>
+        <a [routerLink]="editLink()" class="btn">✎</a>
+        <button (click)="onDeleteClick()">✖</button>
+      </p>
+  </article>
+</div>

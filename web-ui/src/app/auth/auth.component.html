@@ -1,0 +1,9 @@
+<span>
+  @if (isUserStateReady()) {
+    @if (isAuthenticated()) {
+      <app-logout />
+    } @else {
+      <app-login />
+    }
+  }
+</span>

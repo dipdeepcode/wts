@@ -1,0 +1,56 @@
+div {
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+article {
+  padding: 1rem;
+  color: #25113d;
+  background-color: #bf9ee5;
+}
+
+h2 {
+  margin: 0;
+}
+
+time {
+  color: #3c2c50;
+}
+
+.actions {
+  text-align: right;
+  margin: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actions button,
+.actions a.btn {
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background-color: #380774;
+  color: #decdf2;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2rem;
+  min-width: 2.2rem;
+  text-decoration: none;
+}
+
+.actions button:hover,
+.actions button:active,
+.actions a.btn:hover,
+.actions a.btn:active {
+  background-color: #4a0774;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}

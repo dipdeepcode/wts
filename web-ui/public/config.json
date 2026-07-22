@@ -1,0 +1,6 @@
+{
+  "baseUrl": "/api/v1",
+  "meUrl": "/api/me",
+  "loginOptionsUrl": "/login-options",
+  "logoutUri": "/logout"
+}

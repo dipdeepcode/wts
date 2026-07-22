@@ -1,0 +1,9 @@
+<ul id="workspaces">
+  <app-workspace-create />
+  @for (workspace of workspaces(); track $index) {
+    <app-workspace
+      [workspace]="workspace"
+      (deleteClickEvent)="onDeleteClick($event)">
+    </app-workspace>
+  }
+</ul>

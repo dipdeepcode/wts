@@ -1,0 +1,7 @@
+:host {
+  display: block; /* Позволяет компоненту принимать размеры */
+  width: 90%;
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 1rem;
+}

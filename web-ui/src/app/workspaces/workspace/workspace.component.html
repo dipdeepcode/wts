@@ -1,0 +1,8 @@
+<app-workspace-layout
+  [mainLink]="mainLink()"
+  [editLink]="editLink()"
+  [imageAlt]="workspace().name"
+  [showMenu]="true"
+  (deleteClickEvent)="onDeleteClick()">
+  {{ workspace().name }}
+</app-workspace-layout>

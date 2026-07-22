@@ -1,0 +1,15 @@
+<div class="container" [class.selected]="isActive()">
+  <a [routerLink]="mainLink()">
+    <img [src]="imageSrc()" [alt]="imageAlt()" />
+    <span class="content-wrapper">
+      <ng-content />
+    </span>
+  </a>
+
+  @if (showMenu()) {
+    <div class="menu-container">
+      <a [routerLink]="editLink()" class="menu-button">✎</a>
+      <button type="button" class="menu-button" (click)="onDelete()">✖</button>
+    </div>
+  }
+</div>

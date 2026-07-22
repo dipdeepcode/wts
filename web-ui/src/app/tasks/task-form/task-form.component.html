@@ -1,0 +1,38 @@
+<app-manage-layout [layoutHeader]="layoutHeader()" [showMenu]="false">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <p>
+      <label for="title">Title</label>
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        placeholder="Enter title"
+      />
+    </p>
+
+    <p>
+      <label for="summary">Summary</label>
+      <textarea
+        id="summary"
+        formControlName="summary"
+        rows="5"
+        placeholder="Enter summary">
+    </textarea>
+    </p>
+
+    <p>
+      <label for="due-date">Due Date</label>
+      <input
+        type="date"
+        id="due-date"
+      />
+    </p>
+
+    <p class="actions">
+      <button><a routerLink="../../">Cancel</a></button>
+      <button type="submit" [disabled]="form.invalid">
+        {{ formSubmitButtonName() }}
+      </button>
+    </p>
+  </form>
+</app-manage-layout>

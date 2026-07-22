@@ -1,0 +1,31 @@
+<app-manage-layout [layoutHeader]="layoutHeader()" [showMenu]="false">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <p>
+      <label for="name">Workspace name:</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        placeholder="Enter name" />
+    </p>
+
+    <p>
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        rows="5"
+        placeholder="Enter description">
+      </textarea>
+    </p>
+
+    <p class="actions">
+      @if (isEdit()) {
+        <button><a [routerLink]="['../']">Cancel</a></button>
+      }
+      <button type="submit" [disabled]="form.invalid">
+        {{ formSubmitButtonName() }}
+      </button>
+    </p>
+  </form>
+</app-manage-layout>
