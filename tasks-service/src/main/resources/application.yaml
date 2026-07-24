@@ -2,7 +2,13 @@ server:
   port: 8080
   ssl:
     enabled: false
-  forward-headers-strategy: framework
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      # Указываем заголовки, откуда брать реальные параметры запроса
+      remote-ip-header: x-forwarded-for
+      protocol-header: x-forwarded-proto
+      host-header: x-forwarded-host
 
 spring:
   application:
