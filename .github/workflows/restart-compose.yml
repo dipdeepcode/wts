@@ -1,0 +1,78 @@
+name: Restart docker-compose
+
+on:
+  push:
+    branches:
+      - master
+permissions: {}
+
+jobs:
+  restart:
+    name: Restart docker-compose
+    environment: production
+    permissions:
+      contents: read
+    runs-on: ubuntu-22.04
+    env:
+      RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
+      IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
+      GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
+      TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
+      IAM_ISSUER_URI: ${{ vars.KC_HOSTNAME }}/realms/${{ vars.KC_REALM_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Copy docker-compose.yml to VDS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+
+      - name: Restart docker-compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd "${{ vars.SERVER_PROJECT_PATH }}"
+
+            export RDBMS_IMAGE="${{ env.RDBMS_IMAGE }}"
+            export IAM_IMAGE="${{ env.IAM_IMAGE }}"
+            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
+            export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
+
+            export GATEWAY_CLIENT_ID="${{ secrets.GATEWAY_CLIENT_ID }}"
+            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
+
+            export ROOT_DB_NAME="${{ vars.ROOT_DB_NAME }}"
+            export ROOT_DB_USER="${{ secrets.ROOT_DB_USER }}"
+            export ROOT_DB_PASS="${{ secrets.ROOT_DB_PASS }}"
+            export IAM_DB_NAME="${{ vars.IAM_DB_NAME }}"
+            export IAM_DB_USER="${{ secrets.IAM_DB_USER }}"
+            export IAM_DB_PASS="${{ secrets.IAM_DB_PASS }}"
+            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
+            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
+            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
+            export TASKS_SERVICE_DB_NAME="${{ vars.TASKS_SERVICE_DB_NAME }}"
+            export TASKS_SERVICE_DB_USER="${{ secrets.TASKS_SERVICE_DB_USER }}"
+            export TASKS_SERVICE_DB_PASS="${{ secrets.TASKS_SERVICE_DB_PASS }}"
+            export KEYCLOAK_ADMIN_USER="${{ secrets.KEYCLOAK_ADMIN_USER }}"
+            export KEYCLOAK_ADMIN_PASS="${{ secrets.KEYCLOAK_ADMIN_PASS }}"
+            export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
+
+            export FRONTEND_URL="${{ vars.FRONTEND_URL }}"
+            export IAM_ISSUER_URI="${{ env.IAM_ISSUER_URI }}"
+
+            docker compose down
+            docker compose up -d
