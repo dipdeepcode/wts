@@ -37,7 +37,7 @@ spring:
     gateway:
       server:
         webmvc:
-          trusted-proxies: ".*"
+#          trusted-proxies: ".*"
           routes:
             - id: tasks-service
               uri: http://tasks-service:8080/
