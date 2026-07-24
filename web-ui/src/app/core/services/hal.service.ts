@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 
 import {
   Resource,
@@ -21,7 +21,9 @@ export class HalService {
 
   private getRoot<T>(): Observable<Resource<T>> {
     if (!this.rootCache$) {
-      this.rootCache$ = this.http.get<Resource<T>>(this.config.baseUrl).pipe(shareReplay(1));
+      this.rootCache$ = this.http.get<Resource<T>>(this.config.baseUrl).pipe(
+        tap(response => console.log(response)),
+        shareReplay(1));
     }
     return this.rootCache$ as Observable<Resource<T>>;
   }
