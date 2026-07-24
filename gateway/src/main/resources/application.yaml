@@ -81,11 +81,3 @@ com:
             # браузера на эндпоинт инициализации: /oauth2/authorization/keycloak
             authentication-entry-point: UNAUTHORIZED
           pkce-forced: true
-
-logging:
-  level:
-    # Базовое логирование всех запросов Spring Web Client
-    org.springframework.web.client.RestClient: DEBUG
-    # Если используются стандартные HTTP-клиенты Java / Apache под капотом:
-    org.springframework.web.service.invoker: DEBUG
-    org.apache.hc.client5.http: DEBUG
