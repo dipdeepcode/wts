@@ -37,7 +37,7 @@ spring:
     gateway:
       server:
         webmvc:
-#          trusted-proxies: ".*"
+          trusted-proxies: ".*"
           routes:
             - id: tasks-service
               uri: http://tasks-service:8080/
@@ -46,6 +46,9 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
+                - RemoveRequestHeader=X-Forwarded-Host
+                - RemoveRequestHeader=X-Forwarded-Proto
+                - RemoveRequestHeader=X-Forwarded-Port
 
 com:
   c4-soft:
