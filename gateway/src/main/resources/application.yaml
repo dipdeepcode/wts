@@ -2,7 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
-  forward-headers-strategy: native
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -37,7 +37,6 @@ spring:
     gateway:
       server:
         webmvc:
-          trusted-proxies: ".*"
           routes:
             - id: tasks-service
               uri: http://tasks-service:8080/
@@ -46,9 +45,6 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
-                - RemoveRequestHeader=X-Forwarded-Host
-                - RemoveRequestHeader=X-Forwarded-Proto
-                - RemoveRequestHeader=X-Forwarded-Port
 
 com:
   c4-soft:
