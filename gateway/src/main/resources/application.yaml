@@ -45,6 +45,9 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
+          # Разрешаем обрабатывать заголовки X-Forwarded-* от любых прокси (или укажите IP вашего Nginx)
+          trusted-proxies: ".*"
+
 
 com:
   c4-soft:
