@@ -2,7 +2,6 @@ server:
   port: 8080
   ssl:
     enabled: false
-  forward-headers-strategy: framework
 
 spring:
   application:
@@ -45,9 +44,7 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
-          # Разрешаем обрабатывать заголовки X-Forwarded-* от любых прокси (или укажите IP вашего Nginx)
-          trusted-proxies: ".*"
-
+                - AddRequestHeader=X-Forwarded-Host, dipdeepcode.ru
 
 com:
   c4-soft:
@@ -84,3 +81,11 @@ com:
             # браузера на эндпоинт инициализации: /oauth2/authorization/keycloak
             authentication-entry-point: UNAUTHORIZED
           pkce-forced: true
+
+logging:
+  level:
+    # Базовое логирование всех запросов Spring Web Client
+    org.springframework.web.client.RestClient: DEBUG
+    # Если используются стандартные HTTP-клиенты Java / Apache под капотом:
+    org.springframework.web.service.invoker: DEBUG
+    org.apache.hc.client5.http: DEBUG
