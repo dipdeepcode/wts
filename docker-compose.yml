@@ -92,7 +92,7 @@ services:
         condition: service_healthy
       iam:
         condition: service_healthy
-# restart cicd
+
   tasks-service:
     image: ${TASKS_SERVICE_IMAGE}
     restart: unless-stopped
