@@ -2,6 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -44,7 +45,6 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
-                - AddRequestHeader=X-Forwarded-Host, dipdeepcode.ru
 
 com:
   c4-soft:
