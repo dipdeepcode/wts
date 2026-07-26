@@ -102,5 +102,5 @@ jobs:
             export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
 
             docker compose pull rdbms iam
-            docker compose up -d --remove-orphans rdbms iam
+            docker compose up -d --remove-orphans rdbms iam dozzle
             docker image prune -f
