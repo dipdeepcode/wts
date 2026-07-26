@@ -20,8 +20,8 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yml
   jpa:
     open-in-view: false
-    hibernate:
-      ddl-auto: validate
+#    hibernate:
+#      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
