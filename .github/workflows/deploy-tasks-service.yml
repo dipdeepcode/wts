@@ -48,8 +48,8 @@ jobs:
           context: ./tasks-service
           push: true
           tags: ${{ env.TASKS_SERVICE_IMAGE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
 
       - name: Copy docker-compose.yml to VDS
         uses: appleboy/scp-action@v1
