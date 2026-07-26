@@ -19,4 +19,5 @@ COPY --from=builder /builder/extracted/spring-boot-loader/ ./
 COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
 
-ENTRYPOINT ["java", "-jar", "application.jar"]
+#ENTRYPOINT ["java", "-jar", "application.jar"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
