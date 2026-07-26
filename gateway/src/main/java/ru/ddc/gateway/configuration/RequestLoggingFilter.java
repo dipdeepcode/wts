@@ -26,9 +26,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         // Логируем входящий запрос
         logger.info("Request: {} {}", request.getRequestURI(), request.getMethod());
 
-//        logger.info("Реальный IP клиента: {}", request.getRemoteAddr());
-//        logger.info("Реальный протокол (должен быть https): {}", request.getScheme());
-//        logger.info("Реальный порт (должен быть 443): {}", request.getServerPort());
+        logger.info("Реальный IP клиента: {}", request.getRemoteAddr());
+        logger.info("Реальный протокол (должен быть https): {}", request.getScheme());
+        logger.info("Реальный порт (должен быть 443): {}", request.getServerPort());
 
         Collections.list(request.getHeaderNames()).forEach(headerName ->
                 logger.info("Request header: {} = {}", headerName, request.getHeader(headerName))
