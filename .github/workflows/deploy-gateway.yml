@@ -85,5 +85,5 @@ jobs:
             export IAM_ISSUER_URI="${{ env.IAM_ISSUER_URI }}"
 
             docker compose pull gateway
-            docker compose up -d --no-deps gateway
+            docker compose up -d --force-recreate --no-deps gateway
             docker image prune -f
