@@ -8,7 +8,8 @@ RUN mvn clean package -DskipTests
 FROM bellsoft/liberica-openjre-alpine:17-cds AS builder
 WORKDIR /builder
 ARG JAR_FILE=target/*.jar
-COPY --from=build /app/target/*.jar application.jar
+#COPY --from=build /app/target/*.jar application.jar
+COPY --from=build /app/target/gateway-0.0.1-SNAPSHOT.jar application.jar
 RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 FROM bellsoft/liberica-openjre-alpine:17-cds
