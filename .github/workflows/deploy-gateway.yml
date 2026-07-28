@@ -15,6 +15,13 @@ on:
 permissions: {}
 
 jobs:
+
+  create_env:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/create_env.yml
+    secrets: inherit
+
   deploy:
     name: Deploy gateway
     environment: production
@@ -22,12 +29,6 @@ jobs:
       contents: read
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
-    env:
-      RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
-      IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
-      GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
-      TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
-      IAM_ISSUER_URI: ${{ vars.KC_HOSTNAME }}/realms/${{ vars.KC_REALM_NAME }}
 
     steps:
       - name: Checkout repository
@@ -47,7 +48,7 @@ jobs:
         with:
           context: ./gateway
           push: true
-          tags: ${{ env.GATEWAY_IMAGE }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
 
@@ -70,19 +71,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-
-            export RDBMS_IMAGE="${{ env.RDBMS_IMAGE }}"
-            export IAM_IMAGE="${{ env.IAM_IMAGE }}"
-            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
-            export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
-
-            export GATEWAY_CLIENT_ID="${{ secrets.GATEWAY_CLIENT_ID }}"
-            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
-            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
-            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
-            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
-            export FRONTEND_URL="${{ vars.FRONTEND_URL }}"
-            export IAM_ISSUER_URI="${{ env.IAM_ISSUER_URI }}"
 
             docker compose pull gateway
             docker compose up -d --no-deps gateway

@@ -15,6 +15,13 @@ on:
 permissions: {}
 
 jobs:
+
+  create_env:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/create_env.yml
+    secrets: inherit
+
   deploy:
     name: Deploy tasks-service
     environment: production
@@ -22,12 +29,6 @@ jobs:
       contents: read
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
-    env:
-      RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
-      IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
-      GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
-      TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
-      IAM_ISSUER_URI: ${{ vars.KC_HOSTNAME }}/realms/${{ vars.KC_REALM_NAME }}
 
     steps:
       - name: Checkout repository
@@ -47,7 +48,7 @@ jobs:
         with:
           context: ./tasks-service
           push: true
-          tags: ${{ env.TASKS_SERVICE_IMAGE }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
 
@@ -70,16 +71,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-
-            export RDBMS_IMAGE="${{ env.RDBMS_IMAGE }}"
-            export IAM_IMAGE="${{ env.IAM_IMAGE }}"
-            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
-            export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
-
-            export TASKS_SERVICE_DB_NAME="${{ vars.TASKS_SERVICE_DB_NAME }}"
-            export TASKS_SERVICE_DB_USER="${{ secrets.TASKS_SERVICE_DB_USER }}"
-            export TASKS_SERVICE_DB_PASS="${{ secrets.TASKS_SERVICE_DB_PASS }}"
-            export IAM_ISSUER_URI="${{ env.IAM_ISSUER_URI }}"
 
             docker compose pull tasks-service
             docker compose up -d --no-deps tasks-service

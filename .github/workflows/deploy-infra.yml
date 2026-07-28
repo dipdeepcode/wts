@@ -4,17 +4,19 @@ on: workflow_dispatch
 permissions: {}
 
 jobs:
+
+  create_env:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/create_env.yml
+    secrets: inherit
+
   deploy:
     name: Deploy infrastructure
     environment: production
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-    env:
-      RDBMS_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
-      IAM_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
-      GATEWAY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
-      TASKS_SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
 
     steps:
       - name: Checkout repository
@@ -34,7 +36,7 @@ jobs:
         with:
           context: ./rdbms
           push: true
-          tags: ${{ env.RDBMS_IMAGE }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -43,7 +45,7 @@ jobs:
         with:
           context: ./iam
           push: true
-          tags: ${{ env.IAM_IMAGE }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
 
@@ -76,30 +78,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-
-            export RDBMS_IMAGE="${{ env.RDBMS_IMAGE }}"
-            export IAM_IMAGE="${{ env.IAM_IMAGE }}"
-            export GATEWAY_IMAGE="${{ env.GATEWAY_IMAGE }}"
-            export TASKS_SERVICE_IMAGE="${{ env.TASKS_SERVICE_IMAGE }}"
-
-            export GATEWAY_CLIENT_ID="${{ secrets.GATEWAY_CLIENT_ID }}"
-            export GATEWAY_CLIENT_SECRET="${{ secrets.GATEWAY_CLIENT_SECRET }}"
-
-            export ROOT_DB_NAME="${{ vars.ROOT_DB_NAME }}"
-            export ROOT_DB_USER="${{ secrets.ROOT_DB_USER }}"
-            export ROOT_DB_PASS="${{ secrets.ROOT_DB_PASS }}"
-            export IAM_DB_NAME="${{ vars.IAM_DB_NAME }}"
-            export IAM_DB_USER="${{ secrets.IAM_DB_USER }}"
-            export IAM_DB_PASS="${{ secrets.IAM_DB_PASS }}"
-            export SESSIONS_DB_NAME="${{ vars.SESSIONS_DB_NAME }}"
-            export SESSIONS_DB_USER="${{ secrets.SESSIONS_DB_USER }}"
-            export SESSIONS_DB_PASS="${{ secrets.SESSIONS_DB_PASS }}"
-            export TASKS_SERVICE_DB_NAME="${{ vars.TASKS_SERVICE_DB_NAME }}"
-            export TASKS_SERVICE_DB_USER="${{ secrets.TASKS_SERVICE_DB_USER }}"
-            export TASKS_SERVICE_DB_PASS="${{ secrets.TASKS_SERVICE_DB_PASS }}"
-            export KEYCLOAK_ADMIN_USER="${{ secrets.KEYCLOAK_ADMIN_USER }}"
-            export KEYCLOAK_ADMIN_PASS="${{ secrets.KEYCLOAK_ADMIN_PASS }}"
-            export KC_HOSTNAME="${{ vars.KC_HOSTNAME }}"
 
             docker compose pull rdbms iam
             docker compose up -d --remove-orphans rdbms iam dozzle
