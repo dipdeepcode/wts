@@ -34,7 +34,8 @@ jobs:
               echo "${key}=${value}" >> "$file"
               fi
             }
-            set_env API_KEY 12345
+            set_env API_KEY 1234567890
+            set_env SAMPLE foo_bar
 
 
 
