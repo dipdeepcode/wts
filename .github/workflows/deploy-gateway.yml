@@ -28,6 +28,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-22.04
+    needs: create_env
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
