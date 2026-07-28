@@ -1,4 +1,4 @@
-name: create environment file
+name: Create environment file
 
 on:
   workflow_dispatch:
@@ -12,8 +12,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@7
       - name: Create env file
         uses: appleboy/ssh-action@1.0.3
         with:
