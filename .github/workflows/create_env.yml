@@ -1,7 +1,7 @@
 name: Create environment file
 
 on:
-  workflow_dispatch:
+  workflow_call:
 permissions: {}
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Create env file
+      - name: Export data to env
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -34,8 +34,30 @@ jobs:
               echo "${key}=${value}" >> "$file"
               fi
             }
-            set_env API_KEY 1234567890
-            set_env SAMPLE foo_bar
+            set_env RDBMS_IMAGE           ${{ env.RDBMS_IMAGE }}
+            set_env IAM_IMAGE             ${{ env.IAM_IMAGE }}
+            set_env GATEWAY_IMAGE         ${{ env.GATEWAY_IMAGE }}
+            set_env TASKS_SERVICE_IMAGE   ${{ env.TASKS_SERVICE_IMAGE }}
+            set_env GATEWAY_CLIENT_ID     ${{ secrets.GATEWAY_CLIENT_ID }}
+            set_env GATEWAY_CLIENT_SECRET ${{ secrets.GATEWAY_CLIENT_SECRET }}
+            set_env ROOT_DB_NAME          ${{ vars.ROOT_DB_NAME }}
+            set_env ROOT_DB_USER          ${{ secrets.ROOT_DB_USER }}
+            set_env ROOT_DB_PASS          ${{ secrets.ROOT_DB_PASS }}
+            set_env IAM_DB_NAME           ${{ vars.IAM_DB_NAME }}
+            set_env IAM_DB_USER           ${{ secrets.IAM_DB_USER }}
+            set_env IAM_DB_PASS           ${{ secrets.IAM_DB_PASS }}
+            set_env SESSIONS_DB_NAME      ${{ vars.SESSIONS_DB_NAME }}
+            set_env SESSIONS_DB_USER      ${{ secrets.SESSIONS_DB_USER }}
+            set_env SESSIONS_DB_PASS      ${{ secrets.SESSIONS_DB_PASS }}
+            set_env TASKS_SERVICE_DB_NAME ${{ vars.TASKS_SERVICE_DB_NAME }}
+            set_env TASKS_SERVICE_DB_USER ${{ secrets.TASKS_SERVICE_DB_USER }}
+            set_env TASKS_SERVICE_DB_PASS ${{ secrets.TASKS_SERVICE_DB_PASS }}
+            set_env KEYCLOAK_ADMIN_USER   ${{ secrets.KEYCLOAK_ADMIN_USER }}
+            set_env KEYCLOAK_ADMIN_PASS   ${{ secrets.KEYCLOAK_ADMIN_PASS }}
+            set_env KC_HOSTNAME           ${{ vars.KC_HOSTNAME }}
+            set_env FRONTEND_URL          ${{ vars.FRONTEND_URL }}
+            set_env IAM_ISSUER_URI        ${{ env.IAM_ISSUER_URI }}
+            set_env 
 
 
 

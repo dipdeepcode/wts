@@ -1,0 +1,12 @@
+name: Test reusable
+
+on:
+  workflow_dispatch:
+permissions: {}
+
+jobs:
+  test_reusable:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/create_env.yml
+    secrets: inherit
