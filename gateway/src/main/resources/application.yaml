@@ -45,7 +45,7 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
-#                - XForwardedHeaders
+                - XForwardedHeaders
 
 com:
   c4-soft:
