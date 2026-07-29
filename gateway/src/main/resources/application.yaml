@@ -2,7 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
-#  forward-headers-strategy: native
+  forward-headers-strategy: native
 
 spring:
   application:
@@ -45,7 +45,7 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
-#                - XForwardedHeaders
+                - ForwardedRequestHeaders
 
 com:
   c4-soft:
