@@ -50,6 +50,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./gateway
+          push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}:${{ github.sha }}
 #          cache-from: type=gha
