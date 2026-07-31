@@ -2,7 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
-#  forward-headers-strategy: framework
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -40,7 +40,7 @@ spring:
 #          forwarded:
 #            enabled: true
 #            prefix-enabled: true
-          trusted-proxies: ".*"
+#          trusted-proxies: ".*"
           routes:
             - id: tasks-service
               uri: http://tasks-service:8080/
