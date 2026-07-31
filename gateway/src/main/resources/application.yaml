@@ -2,6 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -34,6 +35,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   cloud:
     gateway:
+      mvc:
+        trusted-proxies: ".*"
       server:
         webmvc:
           trusted-proxies: ".*"
