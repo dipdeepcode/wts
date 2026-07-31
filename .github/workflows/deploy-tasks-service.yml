@@ -20,8 +20,6 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/create_env.yml
-    with:
-      gateway_tag: ${{ github.sha }}
     secrets: inherit
 
   deploy:
@@ -51,7 +49,7 @@ jobs:
         with:
           context: ./tasks-service
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
 
