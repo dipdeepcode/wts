@@ -2,7 +2,7 @@ server:
   port: 8080
   ssl:
     enabled: false
-  forward-headers-strategy: framework
+#  forward-headers-strategy: framework
 
 spring:
   application:
@@ -35,11 +35,11 @@ spring:
     driver-class-name: org.postgresql.Driver
   cloud:
     gateway:
-      mvc:
-        trusted-proxies: ".*"
+#      mvc:
+#        trusted-proxies: ".*"
       server:
         webmvc:
-          trusted-proxies: ".*"
+#          trusted-proxies: ".*"
           routes:
             - id: tasks-service
               uri: http://tasks-service:8080/
@@ -48,6 +48,11 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
+                # Явно берем оригинальные заголовки от Nginx или текущего запроса и передаем downstream
+                - AddRequestHeader=X-Forwarded-For, #{request.remoteAddr}
+                - AddRequestHeader=X-Forwarded-Proto, #{request.scheme}
+                - AddRequestHeader=X-Forwarded-Host, #{request.getHeader('Host')}
+                - AddRequestHeader=X-Forwarded-Port, #{request.serverPort}
 
 com:
   c4-soft:
