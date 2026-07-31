@@ -2,6 +2,12 @@ name: Create environment file
 
 on:
   workflow_call:
+    inputs:
+      gateway_tag:
+        description: 'Docker image tag for gateway'
+        required: false
+        type: string
+        default: 'latest'
 permissions: {}
 
 jobs:
@@ -36,8 +42,8 @@ jobs:
             }
             set_env RDBMS_IMAGE           ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.RDBMS_IMAGE_NAME }}
             set_env IAM_IMAGE             ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IAM_IMAGE_NAME }}
-            set_env GATEWAY_IMAGE         ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
-            set_env TASKS_SERVICE_IMAGE   ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
+            set_env GATEWAY_IMAGE         ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}:${{ inputs.gateway_tag }}
+            set_env TASKS_SERVICE_IMAGE   ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}:${{ inputs.gateway_tag }}
             set_env GATEWAY_CLIENT_ID     ${{ secrets.GATEWAY_CLIENT_ID }}
             set_env GATEWAY_CLIENT_SECRET ${{ secrets.GATEWAY_CLIENT_SECRET }}
             set_env ROOT_DB_NAME          ${{ vars.ROOT_DB_NAME }}
