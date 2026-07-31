@@ -24,10 +24,10 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // Логируем входящий запрос
-        logger.debug("Request: {} {}", request.getRequestURI(), request.getMethod());
+        logger.info("Request: {} {}", request.getRequestURI(), request.getMethod());
 
         Collections.list(request.getHeaderNames()).forEach(headerName ->
-                logger.debug("Request header: {} = {}", headerName, request.getHeader(headerName))
+                logger.info("Request header: {} = {}", headerName, request.getHeader(headerName))
         );
 
         try {
@@ -35,9 +35,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             // Логируем ответ после того, как он вернулся из контроллеров/сервлетов
-            logger.debug("Response Status: {}", response.getStatus());
+            logger.info("Response Status: {}", response.getStatus());
             response.getHeaderNames().forEach(headerName ->
-                    logger.debug("Response header: {} = {}", headerName, response.getHeader(headerName))
+                    logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
             );
         }
     }
