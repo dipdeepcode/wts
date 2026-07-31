@@ -37,9 +37,9 @@ spring:
     gateway:
       server:
         webmvc:
-          forwarded:
-            enabled: true
-            prefix-enabled: true
+#          forwarded:
+#            enabled: true
+#            prefix-enabled: true
           trusted-proxies: ".*"
           routes:
             - id: tasks-service
