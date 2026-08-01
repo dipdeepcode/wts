@@ -68,7 +68,7 @@ services:
         condition: service_healthy
 
   gateway:
-    image: ${GATEWAY_IMAGE:-latest}
+    image: ${GATEWAY_IMAGE}
     restart: unless-stopped
     environment:
       TZ: Europe/Moscow
