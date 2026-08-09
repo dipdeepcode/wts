@@ -14,7 +14,7 @@ export class LogoutService {
     return lastValueFrom(
       this.http.post(this.config.logoutUri, null, {
         headers: {
-          'X-POST-LOGOUT-SUCCESS-URI': 'http://dipdeepcode.ru',
+          'X-POST-LOGOUT-SUCCESS-URI': 'https://dipdeepcode.ru',
         },
         observe: 'response',
       }),
