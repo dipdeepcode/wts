@@ -62,8 +62,6 @@ com:
             - ${FRONTEND_URL}/?
           post-logout-allowed-uri-patterns:
             - ${FRONTEND_URL}/?
-          post-logout-success-uri:
-            - ${FRONTEND_URL}/test
           security-matchers:
             - /login/**
             - /oauth2/**
