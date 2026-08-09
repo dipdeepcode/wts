@@ -4,7 +4,7 @@ export const halInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ) => {
-  if (req.url.includes('/login-options') || req.url.includes('/api/me')) {
+  if (req.url.includes('/login-options') || req.url.includes('/api/me') || req.url.includes('/logout')) {
     return next(req);
   }
 
