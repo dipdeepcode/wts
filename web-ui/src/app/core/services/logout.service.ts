@@ -13,6 +13,9 @@ export class LogoutService {
   getLogoutOptions() {
     return lastValueFrom(
       this.http.post(this.config.logoutUri, null, {
+        headers: {
+          'X-POST-LOGOUT-SUCCESS-URI': window.location.origin,
+        },
         observe: 'response',
       }),
     );

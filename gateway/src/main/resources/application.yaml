@@ -60,6 +60,8 @@ com:
           post-login-allowed-uri-patterns:
             - ${FRONTEND_URL}/workspaces.*
             - ${FRONTEND_URL}/?
+          post-logout-allowed-uri-patterns:
+            - ${FRONTEND_URL}(/.*)?$
           security-matchers:
             - /login/**
             - /oauth2/**
