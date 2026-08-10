@@ -37,8 +37,8 @@ export class LoginComponent implements OnInit {
       const successUrl = new URL(ROUTES_CONSTANTS.workspaces, baseUri);
       const failureUrl = new URL('/', baseUri);
 
-      // loginUrl.searchParams.append('post_login_success_uri', successUrl.toString());
-      // loginUrl.searchParams.append('post_login_failure_uri', failureUrl.toString());
+      loginUrl.searchParams.append('post_login_success_uri', successUrl.toString());
+      loginUrl.searchParams.append('post_login_failure_uri', failureUrl.toString());
 
       window.location.href = loginUrl.toString();
     } catch (e) {
