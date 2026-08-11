@@ -41,7 +41,7 @@ jobs:
       - name: Cache Angular Build
         uses: actions/cache@v6
         with:
-          path: web-ui/.angular/cache
+          path: ${{ github.workspace }}/web-ui/.angular/cache
           key: ${{ runner.os }}-angular-${{ hashFiles('web-ui/package-lock.json') }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-angular-${{ hashFiles('web-ui/package-lock.json') }}-
