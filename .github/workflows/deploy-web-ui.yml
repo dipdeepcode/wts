@@ -41,19 +41,19 @@ jobs:
       - name: Cache Angular Build
         uses: actions/cache@v6
         with:
-          path: ${{ github.workspace }}/.angular-cache
+          path: ${{ github.workspace }}/web-ui/.angular/cache
           key: ${{ runner.os }}-angular-${{ hashFiles('web-ui/package-lock.json') }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-angular-${{ hashFiles('web-ui/package-lock.json') }}-
             ${{ runner.os }}-angular-
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Configure Angular Cache
         run: |
-          npx ng cache enable
-          npx ng cache change path ../.angular-cache
+          npx ng config cli.cache.enabled true
+          npx ng config cli.cache.environment all
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build application
         run: npm run build
