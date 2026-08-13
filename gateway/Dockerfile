@@ -3,7 +3,7 @@ WORKDIR /app
 COPY pom.xml .
 RUN --mount=type=cache,target=/root/.m2 mvn -B dependency:go-offline
 COPY src ./src
-RUN --mount=type=cache,target=/root/.m2 mvn -B clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests
 
 FROM bellsoft/liberica-openjre-alpine:17-cds AS builder
 WORKDIR /builder
