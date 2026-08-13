@@ -39,7 +39,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             // Логируем ответ после того, как он вернулся из контроллеров/сервлетов
-            logger.info("Response Status: {}", response.getStatus());
+            logger.info("Response Status test: {}", response.getStatus());
             response.getHeaderNames().forEach(headerName ->
                     logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
             );
