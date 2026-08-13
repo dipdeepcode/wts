@@ -50,8 +50,7 @@ jobs:
         with:
           context: ./gateway
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.GATEWAY_IMAGE_NAME }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

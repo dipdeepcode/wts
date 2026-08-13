@@ -27,6 +27,7 @@ jobs:
     environment: production
     permissions:
       contents: read
+      actions: write
     runs-on: ubuntu-22.04
     needs: create_env
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
@@ -50,8 +51,8 @@ jobs:
           context: ./tasks-service
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Copy docker-compose.yml to VDS
         uses: appleboy/scp-action@v1
@@ -76,8 +77,3 @@ jobs:
             docker compose pull tasks-service
             docker compose up -d --no-deps tasks-service
             docker image prune -f
-
-
-
-
-
