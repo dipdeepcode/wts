@@ -50,8 +50,7 @@ jobs:
         with:
           context: ./tasks-service
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
