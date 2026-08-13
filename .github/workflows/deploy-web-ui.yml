@@ -66,6 +66,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "web-ui/dist/web-ui/browser/*"
-          target: "/var/www/dipdeepcode/data/www/dipdeepcode.ru"
+          target: ${{ secrets.WEB_UI_DEPLOY_TARGET_PATH }}
           strip_components: 4
           rm: true
