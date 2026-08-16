@@ -1,0 +1,51 @@
+name: Copy Nginx configurations
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'nginx/**'
+      - '.github/workflows/deploy-web-ui.yml'
+  workflow_run:
+    workflows:
+      - "Deploy Infrastructure (Postgres, Keycloak)"
+    types:
+      - completed
+permissions: {}
+
+jobs:
+  copy:
+    name: Copy Nginx configurations
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Copy
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "nginx/auth.dipdeepcode.ru.conf"
+          target: "/etc/nginx/vhosts-includes/auth.dipdeepcode.ru"
+          strip_components: 1
+          rm: true
+
+      - name: Copy
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "nginx/dipdeepcode.ru.conf"
+          target: "/etc/nginx/vhosts-includes/dipdeepcode.ru"
+          strip_components: 1
+          rm: true
