@@ -4,7 +4,7 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 
-RUN /opt/keycloak/bin/kc.sh build
+RUN /opt/keycloak/bin/kc.sh build --features-disabled="identity-brokering-api,twitter-broker"
 
 FROM quay.io/keycloak/keycloak:26.7.0
 
