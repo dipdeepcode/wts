@@ -46,6 +46,7 @@ services:
       KC_DB_PASSWORD: ${IAM_DB_PASS}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASS}
+      KC_FEATURES_DISABLED: identity-brokering-api,twitter-broker
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT: false
