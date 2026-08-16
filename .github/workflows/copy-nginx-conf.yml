@@ -19,7 +19,7 @@ jobs:
     name: Copy Nginx configurations
     permissions:
       contents: read
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
@@ -33,19 +33,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "nginx/auth.dipdeepcode.ru.conf"
-          target: "/etc/nginx/vhosts-includes/auth.dipdeepcode.ru"
-          strip_components: 1
-          rm: true
-
-      - name: Copy
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "nginx/dipdeepcode.ru.conf"
-          target: "/etc/nginx/vhosts-includes/dipdeepcode.ru"
+          source: "nginx/*.conf"
+          target: "/etc/nginx/vhosts-includes"
           strip_components: 1
           rm: true
