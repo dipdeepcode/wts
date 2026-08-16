@@ -120,6 +120,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "127.0.0.1:8888:8080"
+    networks:
+      - dozzle-dummy_net
 
 volumes:
   rdbms_vol:
@@ -134,4 +136,7 @@ networks:
     driver: bridge
   tasks-service_net:
     name: tasks-service_net
+    driver: bridge
+  dozzle-dummy_net:
+    name: dozzle-dummy_net
     driver: bridge
