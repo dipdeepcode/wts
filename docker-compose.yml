@@ -36,7 +36,7 @@ services:
   iam:
     image: ${IAM_IMAGE}
     restart: unless-stopped
-    command: start --optimized
+    command: start --optimized --import-realm
     environment:
       TZ: Europe/Moscow
       KC_DB: postgres
