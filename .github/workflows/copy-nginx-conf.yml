@@ -37,4 +37,3 @@ jobs:
           source: "nginx/"
           target: "/etc/nginx/vhosts-includes"
           strip_components: 1
-          rm: true
