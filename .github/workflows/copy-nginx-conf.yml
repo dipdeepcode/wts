@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - 'nginx/**'
-      - '.github/workflows/deploy-web-ui.yml'
+      - '.github/workflows/copy-nginx-conf.yml'
   workflow_run:
     workflows:
       - "Deploy Infrastructure (Postgres, Keycloak)"
@@ -15,8 +15,9 @@ on:
 permissions: {}
 
 jobs:
-  copy:
+  copy_configurations:
     name: Copy Nginx configurations
+    environment: production
     permissions:
       contents: read
     runs-on: ubuntu-22.04
