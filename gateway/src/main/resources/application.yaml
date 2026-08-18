@@ -39,6 +39,10 @@ spring:
         webmvc:
           trusted-proxies: ".*"
           routes:
+            - id: local_me_endpoint
+              predicates:
+                - Path=/api/me2
+              uri: forward:/api/me2
             - id: tasks-service
               uri: http://tasks-service:8080/
               predicates:
@@ -72,6 +76,7 @@ com:
             - /oauth2/**
             - /login-options
             - /api/me
+            - /api/me2
           # Защита от CSRF. Библиотека создаст куку XSRF-TOKEN, которую Angular прочитает автоматически
           csrf: cookie-accessible-from-js
           oauth2-redirections:
