@@ -47,5 +47,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            sudo nginx -t
-            sudo systemctl reload nginx
+            nginx -t
+            systemctl reload nginx
