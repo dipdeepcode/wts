@@ -42,7 +42,7 @@ spring:
             - id: tasks-service
               uri: http://tasks-service:8080/
               predicates:
-                - Path=/api, /api/(?!me$).*
+                - Path=/api, /api/**
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
@@ -55,7 +55,6 @@ com:
           - iss: ${IAM_ISSUER_URI}
             aud: ${GATEWAY_CLIENT_ID}
         client:
-          # Внешний адрес вашего фронтенда Angular
           client-uri: ${FRONTEND_URL}
           post-login-allowed-uri-patterns:
             - ${FRONTEND_URL}/workspaces.*
@@ -67,20 +66,14 @@ com:
             - /oauth2/**
             - /logout/**
             - /api/**
-            - /me
+            - /bff/**
           permit-all:
             - /login/**
             - /oauth2/**
             - /login-options
-            - /api/me
-            - /me
-          # Защита от CSRF. Библиотека создаст куку XSRF-TOKEN, которую Angular прочитает автоматически
+            - /bff/me
           csrf: cookie-accessible-from-js
           oauth2-redirections:
-            # При логауте шлюз корректно оповестит Keycloak (302 редирект)
             rp-initiated-logout: ACCEPTED
-            # Для API эндпоинтов шлюз вернет 401 вместо 302 редиректа на форму ввода пароля.
-            # Это заставит Angular перехватить 401 ошибку и самостоятельно сделать редирект
-            # браузера на эндпоинт инициализации: /oauth2/authorization/keycloak
             authentication-entry-point: UNAUTHORIZED
           pkce-forced: true

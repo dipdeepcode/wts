@@ -11,26 +11,8 @@ import java.util.Objects;
 @RestController
 public class MeController {
 
-    @GetMapping("/api/me")
+    @GetMapping("/bff/me")
     public Map<String, Object> getUserInfo(@AuthenticationPrincipal OidcUser oidcUser) {
-        if (oidcUser == null) {
-            return Map.of("error", "Unauthorized");
-        }
-
-        Long expiresAtSeconds = oidcUser.getExpiresAt() != null
-                ? oidcUser.getExpiresAt().getEpochSecond()
-                : null;
-
-        return Map.of(
-                "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
-                "email", Objects.requireNonNull(oidcUser.getEmail()),
-                "roles", oidcUser.getAuthorities(),
-                "exp", Objects.requireNonNull(expiresAtSeconds)
-        );
-    }
-
-    @GetMapping("/me")
-    public Map<String, Object> getUserInfo2(@AuthenticationPrincipal OidcUser oidcUser) {
         if (oidcUser == null) {
             return Map.of("error", "Unauthorized");
         }
