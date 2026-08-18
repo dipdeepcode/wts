@@ -12,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
 export class HeaderComponent {
   private http = inject(HttpClient);
   protected get_api_me2() {
-    this.http.get('/api/me2').subscribe({
+    this.http.get('/me').subscribe({
       next: (resp) => console.dir(resp)
     })
   }
