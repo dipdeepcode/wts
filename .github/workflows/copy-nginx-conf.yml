@@ -37,6 +37,7 @@ jobs:
           source: "nginx/"
           target: "/etc/nginx/vhosts-includes"
           strip_components: 1
+          overwrite: true
 
       - name: Reload nginx
         uses: appleboy/ssh-action@v1.0.3
