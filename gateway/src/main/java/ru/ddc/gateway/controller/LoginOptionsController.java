@@ -1,5 +1,6 @@
 package ru.ddc.gateway.controller;
 
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,14 +19,29 @@ public class LoginOptionsController {
 
     @GetMapping("/login-options")
     public LoginOption getLoginOptions() {
-        // Преобразуем Iterable в Stream и мапим в наш DTO
         return StreamSupport.stream(clientRegistrationRepository.spliterator(), false)
                 .filter(registration -> "keycloak".equals(registration.getRegistrationId()))
-                .map(registration -> new LoginOption(
-                        registration.getClientName(),
-                        "/oauth2/authorization/" + registration.getRegistrationId()
-                ))
+                .map(this::buildLoginOption)
                 .findFirst()
-                .orElse(new LoginOption("", ""));
+                .orElse(new LoginOption("", "", ""));
     }
+
+    private LoginOption buildLoginOption(ClientRegistration registration) {
+        String label = registration.getClientName();
+        String loginUri = "/oauth2/authorization/" + registration.getRegistrationId();
+        String accountConsoleUrl = "";
+
+        String issuerUri = (String) registration.getProviderDetails().getConfigurationMetadata().get("issuer");
+
+        if (issuerUri == null) {
+            issuerUri = registration.getProviderDetails().getIssuerUri();
+        }
+
+        if (issuerUri != null) {
+            accountConsoleUrl = issuerUri.replaceAll("/$", "") + "/account";
+        }
+
+        return new LoginOption(label, loginUri, accountConsoleUrl);
+    }
+
 }
