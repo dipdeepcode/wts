@@ -70,7 +70,7 @@ com:
           permit-all:
             - /login/**
             - /oauth2/**
-            - /login-options
+            - /bff/login-options
           csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
