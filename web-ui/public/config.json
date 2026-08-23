@@ -1,6 +1,6 @@
 {
   "baseUrl": "/api/v1",
-  "meUrl": "/api/me",
+  "meUrl": "/bff/me",
   "loginOptionsUrl": "/bff/login-options",
   "logoutUri": "/logout"
 }
