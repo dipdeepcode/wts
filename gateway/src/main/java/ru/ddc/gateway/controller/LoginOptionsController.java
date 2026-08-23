@@ -2,13 +2,11 @@ package ru.ddc.gateway.controller;
 
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping("/bff")
 public class LoginOptionsController {
     private final InMemoryClientRegistrationRepository clientRegistrationRepository;
 
