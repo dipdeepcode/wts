@@ -71,6 +71,7 @@ com:
             - /login/**
             - /oauth2/**
             - /login-options
+            - /bff/me
           csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
