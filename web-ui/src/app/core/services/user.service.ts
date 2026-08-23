@@ -37,24 +37,22 @@ export class UserService {
 
     return this.http.get<UserinfoDto>(this.configService.meUrl).pipe(
       tap((user) => {
-        if (
-          user.username !== this._user().name ||
-          user.email !== this._user().email ||
-          (user.roles || []).toString() !== this._user().roles.toString()
-        ) {
-          this._user.set(
-            user.username ? new User(user.username, user.email, user.roles) : User.ANONYMOUS,
-          );
-        }
+        this._user.set(
+          user && user.username
+            ? new User(user.username, user.email, user.roles)
+            : User.ANONYMOUS
+        );
 
         this.setupAutoRefresh(user);
 
         this.isUserStateReady.set(true);
       }),
-      catchError(() => {
+      catchError((error) => {
         this._user.set(User.ANONYMOUS);
         this.isUserStateReady.set(true);
-        this.toast.show('Failed to load user data');
+        if (error.status !== 401) {
+          this.toast.show('Failed to load user data');
+        }
         return of(null);
       }),
     );
