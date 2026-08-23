@@ -15,12 +15,19 @@ public class MeController {
 
     @GetMapping("/me")
     public Map<String, Object> getUserInfo(@AuthenticationPrincipal OidcUser oidcUser) {
+        if (oidcUser == null) {
+            return Map.of("error", "Unauthorized");
+        }
+
+        Long expiresAtSeconds = oidcUser.getExpiresAt() != null
+                ? oidcUser.getExpiresAt().getEpochSecond()
+                : null;
 
         return Map.of(
                 "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
                 "email", Objects.requireNonNull(oidcUser.getEmail()),
                 "roles", oidcUser.getAuthorities(),
-                "exp", Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond()
+                "exp", Objects.requireNonNull(expiresAtSeconds)
         );
     }
 
