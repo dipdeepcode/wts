@@ -54,6 +54,11 @@ com:
         ops:
           - iss: ${IAM_ISSUER_URI}
             aud: ${GATEWAY_CLIENT_ID}
+            authorities:
+              - path: $.realm_access.roles
+                prefix: ROLE_
+              - path: $.resource_access.gateway.roles
+                prefix: ROLE_
         client:
           client-uri: ${FRONTEND_URL}
           post-login-allowed-uri-patterns:
