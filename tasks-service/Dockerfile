@@ -13,9 +13,10 @@ RUN java -Djarmode=tools -jar application.jar extract --layers --destination ext
 
 FROM bellsoft/liberica-openjre-alpine:17-cds
 WORKDIR /application
-COPY --from=builder /builder/extracted/dependencies/ ./
-COPY --from=builder /builder/extracted/spring-boot-loader/ ./
-COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
-COPY --from=builder /builder/extracted/application/ ./
-
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+COPY --from=builder --chown=appuser:appgroup /builder/extracted/dependencies/ ./
+COPY --from=builder --chown=appuser:appgroup /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=appuser:appgroup /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=appuser:appgroup /builder/extracted/application/ ./
+USER appuser
 ENTRYPOINT ["java", "-jar", "application.jar"]
