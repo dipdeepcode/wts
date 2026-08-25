@@ -58,4 +58,5 @@ export interface UserinfoDto {
 export interface LoginOptionDto {
   label: string;
   loginUri: string;
+  accountConsoleUrl: string;
 }

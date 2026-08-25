@@ -2,9 +2,9 @@
   @if (isUserStateReady()) {
     @if (isAuthenticated()) {
       <app-logout />
-      <button>Account Console</button>
+      <button (click)="redirectToAccountConsole()">Account Console</button>
     } @else {
-      <app-login />
+      <app-login [loginOptions]="loginOptions()" />
     }
   }
 </span>
