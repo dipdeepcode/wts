@@ -36,7 +36,11 @@ export class AuthComponent implements OnInit {
     }
 
     try {
-      window.location.href = loginOptions.accountConsoleUrl.toString();
+      const url = new URL(loginOptions.accountConsoleUrl);
+      const currentUrl = window.location.href;
+      url.searchParams.append('referrer', 'gateway');
+      url.searchParams.append('referrer_uri', currentUrl);
+      window.location.href = url.toString();
     } catch (e) {
       this.toast.show('Invalid Account console URI');
     }
