@@ -5,7 +5,9 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.StandardCharsets;
 import java.util.stream.StreamSupport;
 
 @RestController
@@ -38,7 +40,13 @@ public class LoginOptionsController {
         }
 
         if (issuerUri != null) {
-            accountConsoleUrl = issuerUri.replaceAll("/$", "") + "/account";
+            String baseAccountUrl = issuerUri.replaceAll("/$", "") + "/account";
+            String clientId = registration.getClientId();
+
+            accountConsoleUrl = UriComponentsBuilder.fromUriString(baseAccountUrl)
+                    .queryParam("referrer", clientId)
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
         }
 
         return new LoginOption(label, loginUri, accountConsoleUrl);
