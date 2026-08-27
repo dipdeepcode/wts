@@ -40,4 +40,4 @@ com:
               - path: $.resource_access.*.roles
         resourceserver:
           permit-all:
-            - /api/me
+            - /healthcheck
