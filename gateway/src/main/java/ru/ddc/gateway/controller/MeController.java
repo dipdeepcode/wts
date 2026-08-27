@@ -20,14 +20,14 @@ public class MeController {
 
         List<String> roles = oidcUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .filter(auth -> auth.startsWith("ROLE_"))
-                .map(auth -> auth.replace("ROLE_", ""))
+//                .filter(auth -> auth.startsWith("ROLE_"))
+//                .map(auth -> auth.replace("ROLE_", ""))
                 .toList();
 
         return Map.of(
                 "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
                 "email", Objects.requireNonNull(oidcUser.getEmail()),
-                "roles", roles, // Теперь тут будет просто ["DEBUGGER"]
+                "roles", roles,
                 "exp", Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond()
         );
     }

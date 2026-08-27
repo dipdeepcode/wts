@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE) // Ставит фильтр самым первым в цепочке
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestLoggingFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
 
@@ -23,26 +23,21 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Логируем входящий запрос
-        logger.info("Request: {} {}", request.getRequestURI(), request.getMethod());
-
-//        logger.info("Реальный IP клиента: {}", request.getRemoteAddr());
-//        logger.info("Реальный протокол (должен быть https): {}", request.getScheme());
-//        logger.info("Реальный порт (должен быть 443): {}", request.getServerPort());
-
-        Collections.list(request.getHeaderNames()).forEach(headerName ->
-                logger.info("Request header: {} = {}", headerName, request.getHeader(headerName))
-        );
-
-        try {
-            // Передаем запрос дальше по цепочке
-            filterChain.doFilter(request, response);
-        } finally {
-            // Логируем ответ после того, как он вернулся из контроллеров/сервлетов
-            logger.info("Response Status: {}", response.getStatus());
-            response.getHeaderNames().forEach(headerName ->
-                    logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
+        if (!"/healthcheck".equals(request.getRequestURI())) {
+            logger.info("Request: {} {}", request.getRequestURI(), request.getMethod());
+            Collections.list(request.getHeaderNames()).forEach(headerName ->
+                    logger.info("Request header: {} = {}", headerName, request.getHeader(headerName))
             );
+            try {
+                filterChain.doFilter(request, response);
+            } finally {
+                logger.info("Response Status: {}", response.getStatus());
+                response.getHeaderNames().forEach(headerName ->
+                        logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
+                );
+            }
+        } else {
+            filterChain.doFilter(request, response);
         }
     }
 }
