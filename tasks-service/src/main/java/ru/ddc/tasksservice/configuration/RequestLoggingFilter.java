@@ -36,8 +36,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                         logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
                 );
             }
+        } else {
+            filterChain.doFilter(request, response);
         }
 
-        filterChain.doFilter(request, response);
     }
 }
