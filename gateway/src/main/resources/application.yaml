@@ -76,8 +76,11 @@ com:
             - /login/**
             - /oauth2/**
             - /bff/login-options
+            - /logout/connect/back-channel/**
           csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
             authentication-entry-point: UNAUTHORIZED
           pkce-forced: true
+          back-channel-logout:
+            enabled: true
