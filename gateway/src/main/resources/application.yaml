@@ -24,6 +24,7 @@ spring:
               - openid
               - profile
               - email
+              - offline_access
   session:
     store-type: jdbc
     jdbc:
