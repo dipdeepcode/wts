@@ -28,7 +28,8 @@ public class MeController {
                 "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
                 "email", Objects.requireNonNull(oidcUser.getEmail()),
                 "roles", roles,
-                "exp", Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond()
+                "exp", Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond(),
+                "exp2", Objects.requireNonNull(oidcUser.getIdToken().getClaimAsInstant("exp")).getEpochSecond()
         );
     }
 
