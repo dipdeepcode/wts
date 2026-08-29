@@ -1,7 +1,12 @@
 package ru.ddc.gateway.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,22 +19,43 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/bff")
 public class MeController {
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
+
+    public MeController(OAuth2AuthorizedClientManager authorizedClientManager) {
+        this.authorizedClientManager = authorizedClientManager;
+    }
 
     @GetMapping("/me")
-    public Map<String, Object> getUserInfo(@AuthenticationPrincipal OidcUser oidcUser) {
+    public Map<String, Object> getUserInfo(Authentication authentication,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
 
-        List<String> roles = oidcUser.getAuthorities().stream()
+        OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
+
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+                .withClientRegistrationId("keycloak")
+                .principal(authentication)
+                .attribute(HttpServletRequest.class.getName(), request)
+                .attribute(HttpServletResponse.class.getName(), response)
+                .build();
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+
+        long exp = (authorizedClient != null)
+                ? Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond()
+                : Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond();
+
+        List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-//                .filter(auth -> auth.startsWith("ROLE_"))
-//                .map(auth -> auth.replace("ROLE_", ""))
                 .toList();
 
         return Map.of(
                 "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
                 "email", Objects.requireNonNull(oidcUser.getEmail()),
                 "roles", roles,
-                "exp", Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond()
+                "exp", exp
         );
+
     }
 
 }
