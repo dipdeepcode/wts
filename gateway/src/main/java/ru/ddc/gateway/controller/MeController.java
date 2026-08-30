@@ -73,6 +73,14 @@ public class MeController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        Map<String, Object> realmAccess = oidcUser.getIdToken().getClaim("realm_access");
+        if (realmAccess != null && realmAccess.get("roles") instanceof java.util.Collection<?> rawRoles) {
+            List<String> keycloakRoles = rawRoles.stream()
+                    .map(role -> "ROLE_" + role.toString())
+                    .toList();
+            roles.addAll(keycloakRoles);
+        }
+
         return Map.of(
                 "username", Objects.requireNonNull(oidcUser.getPreferredUsername()),
                 "email", Objects.requireNonNull(oidcUser.getEmail()),
