@@ -38,7 +38,9 @@ com:
             username-claim: $.preferred_username
             authorities:
               - path: $.realm_access.roles
+                prefix: ROLE_
               - path: $.resource_access.*.roles
+                prefix: ROLE_
         resourceserver:
           permit-all:
             - /healthcheck
