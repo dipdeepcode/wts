@@ -69,9 +69,11 @@ public class MeController {
 
         long exp = Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond();
 
-        List<String> roles = oidcUser.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        List<String> roles = new java.util.ArrayList<>(
+                oidcUser.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList()
+        );
 
         Map<String, Object> realmAccess = oidcUser.getIdToken().getClaim("realm_access");
         if (realmAccess != null && realmAccess.get("roles") instanceof java.util.Collection<?> rawRoles) {
