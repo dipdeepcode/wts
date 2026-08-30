@@ -2,6 +2,8 @@ package ru.ddc.gateway.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import ru.ddc.gateway.configuration.RequestLoggingFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,8 @@ import java.util.Objects;
 @RequestMapping("/bff")
 public class MeController {
     private final OAuth2AuthorizedClientManager authorizedClientManager;
+    private static final Logger logger = LoggerFactory.getLogger(MeController.class);
+
 
     public MeController(OAuth2AuthorizedClientManager authorizedClientManager) {
         this.authorizedClientManager = authorizedClientManager;
@@ -61,6 +66,7 @@ public class MeController {
 
         long exp = Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond();
 
+        logger.info("Authorities: {}", oidcUser.getAuthorities());
         List<String> roles = oidcUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
