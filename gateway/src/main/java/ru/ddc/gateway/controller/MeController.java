@@ -43,6 +43,9 @@ public class MeController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
 
+        String rawIdToken = oidcUser.getIdToken().getTokenValue();
+        logger.info("Raw ID Token (JWT): {}", rawIdToken);
+
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withClientRegistrationId("keycloak")
                 .principal(authentication)
@@ -66,7 +69,6 @@ public class MeController {
 
         long exp = Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond();
 
-        logger.info("Authorities: {}", oidcUser.getAuthorities());
         List<String> roles = oidcUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
