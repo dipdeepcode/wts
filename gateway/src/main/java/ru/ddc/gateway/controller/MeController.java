@@ -45,7 +45,7 @@ public class MeController {
                 ? Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond()
                 : Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond();
 
-        List<String> roles = authentication.getAuthorities().stream()
+        List<String> roles = oidcUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
