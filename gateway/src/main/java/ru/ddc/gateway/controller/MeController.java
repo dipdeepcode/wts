@@ -2,15 +2,19 @@ package ru.ddc.gateway.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +34,9 @@ public class MeController {
                                            HttpServletRequest request,
                                            HttpServletResponse response) {
 
-        OidcUser oidcUser = (OidcUser) authentication.getPrincipal();
+        if (authentication == null || !(authentication.getPrincipal() instanceof OidcUser oidcUser)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
 
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withClientRegistrationId("keycloak")
@@ -39,11 +45,21 @@ public class MeController {
                 .attribute(HttpServletResponse.class.getName(), response)
                 .build();
 
-        OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+        OAuth2AuthorizedClient authorizedClient;
+        try {
+            authorizedClient = authorizedClientManager.authorize(authorizeRequest);
 
-        long exp = (authorizedClient != null)
-                ? Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond()
-                : Objects.requireNonNull(oidcUser.getExpiresAt()).getEpochSecond();
+            if (authorizedClient == null) {
+                handleLocalLogout(request, response, authentication);
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization context missing");
+            }
+
+        } catch (OAuth2AuthorizationException ex) {
+            handleLocalLogout(request, response, authentication);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session expired in Identity Provider", ex);
+        }
+
+        long exp = Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond();
 
         List<String> roles = oidcUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -56,6 +72,13 @@ public class MeController {
                 "exp", exp
         );
 
+    }
+
+    private void handleLocalLogout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.setClearAuthentication(true);
+        logoutHandler.setInvalidateHttpSession(true);
+        logoutHandler.logout(request, response, authentication);
     }
 
 }
