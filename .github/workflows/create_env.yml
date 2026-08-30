@@ -40,6 +40,7 @@ jobs:
             set_env TASKS_SERVICE_IMAGE   ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.TASKS_SERVICE_IMAGE_NAME }}
             set_env GATEWAY_CLIENT_ID     ${{ secrets.GATEWAY_CLIENT_ID }}
             set_env GATEWAY_CLIENT_SECRET ${{ secrets.GATEWAY_CLIENT_SECRET }}
+            set_env GATEWAY_AUD           ${{ secrets.GATEWAY_AUD }}
             set_env ROOT_DB_NAME          ${{ vars.ROOT_DB_NAME }}
             set_env ROOT_DB_USER          ${{ secrets.ROOT_DB_USER }}
             set_env ROOT_DB_PASS          ${{ secrets.ROOT_DB_PASS }}
@@ -52,6 +53,7 @@ jobs:
             set_env TASKS_SERVICE_DB_NAME ${{ vars.TASKS_SERVICE_DB_NAME }}
             set_env TASKS_SERVICE_DB_USER ${{ secrets.TASKS_SERVICE_DB_USER }}
             set_env TASKS_SERVICE_DB_PASS ${{ secrets.TASKS_SERVICE_DB_PASS }}
+            set_env TASKS_SERVICE_AUD     ${{ secrets.TASKS_SERVICE_AUD }}
             set_env KEYCLOAK_ADMIN_USER   ${{ secrets.KEYCLOAK_ADMIN_USER }}
             set_env KEYCLOAK_ADMIN_PASS   ${{ secrets.KEYCLOAK_ADMIN_PASS }}
             set_env KC_HOSTNAME           ${{ vars.KC_HOSTNAME }}

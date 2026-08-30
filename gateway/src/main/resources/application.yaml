@@ -53,7 +53,7 @@ com:
       oidc:
         ops:
           - iss: ${IAM_ISSUER_URI}
-            aud: ${GATEWAY_CLIENT_ID}
+            aud: ${GATEWAY_AUD}
         client:
           client-uri: ${FRONTEND_URL}
           post-login-allowed-uri-patterns:
