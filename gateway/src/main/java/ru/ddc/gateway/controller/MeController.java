@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -17,11 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import ru.ddc.gateway.configuration.RequestLoggingFilter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/bff")
@@ -69,18 +65,12 @@ public class MeController {
 
         long exp = Objects.requireNonNull(authorizedClient.getAccessToken().getExpiresAt()).getEpochSecond();
 
-        List<String> roles = new java.util.ArrayList<>(
-                oidcUser.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList()
-        );
-
-        Map<String, Object> realmAccess = oidcUser.getIdToken().getClaim("realm_access");
-        if (realmAccess != null && realmAccess.get("roles") instanceof java.util.Collection<?> rawRoles) {
-            List<String> keycloakRoles = rawRoles.stream()
+        List<String> roles = new ArrayList<>();
+        Object rawRoles = oidcUser.getIdToken().getClaim("custom_realm_roles");
+        if (rawRoles instanceof Collection<?> rolesCollection) {
+            roles = rolesCollection.stream()
                     .map(role -> "ROLE_" + role.toString())
                     .toList();
-            roles.addAll(keycloakRoles);
         }
 
         return Map.of(
