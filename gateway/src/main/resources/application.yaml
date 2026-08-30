@@ -24,7 +24,6 @@ spring:
               - openid
               - profile
               - email
-              - custom-roles
   session:
     store-type: jdbc
     jdbc:
