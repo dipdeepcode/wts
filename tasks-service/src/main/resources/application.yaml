@@ -34,7 +34,7 @@ com:
       oidc:
         ops:
           - iss: ${IAM_ISSUER_URI}
-            aud: ${TASKS_SERVICE_AUD}
+            aud: tasks-service
             username-claim: $.preferred_username
             authorities:
               - path: $.realm_access.roles
