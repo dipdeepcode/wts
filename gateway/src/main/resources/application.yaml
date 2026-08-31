@@ -24,6 +24,7 @@ spring:
               - openid
               - profile
               - email
+              - audience
   session:
     store-type: jdbc
     jdbc:
