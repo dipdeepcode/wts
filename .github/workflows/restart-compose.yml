@@ -1,11 +1,6 @@
 name: Restart docker-compose
 
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'docker-compose.yml'
+on: workflow_dispatch
 permissions: {}
 
 jobs:

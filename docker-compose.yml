@@ -36,7 +36,7 @@ services:
   iam:
     image: ${IAM_IMAGE}
     restart: unless-stopped
-    command: start --optimized --import-realm
+    command: start --optimized
     environment:
       TZ: Europe/Moscow
       KC_DB: postgres
@@ -51,16 +51,15 @@ services:
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: false
       KC_CACHE: local
-      GATEWAY_CLIENT_ID: ${GATEWAY_CLIENT_ID}
-      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
-      FRONTEND_URL: ${FRONTEND_URL}
+      KC_HTTP_MANAGEMENT_ENABLED: true
+      KC_HTTP_MANAGEMENT_PORT: 9000
     ports:
       - "127.0.0.1:8085:8080"
     networks:
       - rdbms_net
       - iam_net
     healthcheck:
-      test: ["CMD-SHELL", "curl --head -fsS http://localhost:9000/health/ready | echo $?"]
+      test: ["CMD", "bash", "-c", "</dev/tcp/localhost/9000"]
       interval: 30s
       timeout: 10s
       retries: 5
