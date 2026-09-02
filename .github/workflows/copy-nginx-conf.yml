@@ -7,11 +7,6 @@ on:
     paths:
       - 'nginx/**'
       - '.github/workflows/copy-nginx-conf.yml'
-  workflow_run:
-    workflows:
-      - "Deploy Infrastructure (Postgres, Keycloak)"
-    types:
-      - completed
 permissions: {}
 
 jobs:

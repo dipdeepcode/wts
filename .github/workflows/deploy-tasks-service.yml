@@ -7,11 +7,6 @@ on:
     paths:
       - 'tasks-service/**'
       - '.github/workflows/deploy-tasks-service.yml'
-  workflow_run:
-    workflows:
-      - "Deploy Infrastructure (Postgres, Keycloak)"
-    types:
-      - completed
 permissions: {}
 
 jobs:
