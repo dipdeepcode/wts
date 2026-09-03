@@ -1,0 +1,53 @@
+name: Deploy iam configuration
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'iam/realms/wts-realm.json'
+permissions: {}
+
+jobs:
+  deploy:
+    name: Deploy realm configuration
+    environment: production
+    permissions:
+      contents: read
+      actions: write
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Copy realm configuration
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "iam/realms/wts-realm.json"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+          strip_components: 1
+
+      - name: Apply realm configuration
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd "${{ vars.SERVER_PROJECT_PATH }}"
+            
+            docker run --rm \
+              --network iam_net \
+              -e KEYCLOAK_URL="http://iam:8080" \
+              -e KEYCLOAK_USER=${{ secrets.KEYCLOAK_ADMIN_USER }} \
+              -e KEYCLOAK_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASS }} \
+              -e IMPORT_FILES_LOCATIONS='/config/wts-realm.json' \
+              -v "$PWD/realms":/config \
+              adorsys/keycloak-config-cli:edge
+          
