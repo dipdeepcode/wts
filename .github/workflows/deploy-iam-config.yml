@@ -24,6 +24,7 @@ jobs:
       contents: read
       actions: write
     runs-on: ubuntu-22.04
+    needs: create_env
 
     steps:
       - name: Checkout repository
