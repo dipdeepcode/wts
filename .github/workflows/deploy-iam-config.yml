@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'iam/realms/wts-realm.json'
+      - '.github/workflows/deploy-iam-config.yml'
 permissions: {}
 
 jobs:
