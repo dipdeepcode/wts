@@ -48,7 +48,7 @@ jobs:
               -e KEYCLOAK_USER=${{ secrets.KEYCLOAK_ADMIN_USER }} \
               -e KEYCLOAK_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASS }} \
               -e IMPORT_FILES_LOCATIONS='/config/wts-realm.json' \
-              -e IMPORT_VARSUBSTITUTION=true \
+              -e IMPORT_VARSUBSTITUTION_ENABLED="true" \
               -e KC_REALM_NAME="${{ secrets.KC_REALM_NAME }}" \
               -v "$PWD/realms":/config \
               adorsys/keycloak-config-cli:edge
