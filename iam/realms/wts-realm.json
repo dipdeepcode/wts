@@ -1,4 +1,4 @@
 {
   "enabled": true,
-  "realm": "${REALM_NAME}"
+  "realm": "$(env:KC_REALM_NAME)"
 }
