@@ -10,6 +10,13 @@ on:
 permissions: {}
 
 jobs:
+
+  create_env:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/create_env.yml
+    secrets: inherit
+
   deploy:
     name: Deploy realm configuration
     environment: production

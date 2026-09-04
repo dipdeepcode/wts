@@ -57,6 +57,7 @@ jobs:
             set_env KEYCLOAK_ADMIN_USER   ${{ secrets.KEYCLOAK_ADMIN_USER }}
             set_env KEYCLOAK_ADMIN_PASS   ${{ secrets.KEYCLOAK_ADMIN_PASS }}
             set_env KC_HOSTNAME           ${{ vars.KC_HOSTNAME }}
+            set_env KC_REALM_NAME         ${{ vars.KC_REALM_NAME }}
             set_env FRONTEND_URL          ${{ vars.FRONTEND_URL }}
             set_env IAM_ISSUER_URI        ${{ vars.KC_HOSTNAME }}/realms/${{ vars.KC_REALM_NAME }}
 
