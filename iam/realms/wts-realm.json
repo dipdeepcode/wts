@@ -69,7 +69,10 @@
         "clientRole": false,
         "attributes": {}
       }
-    ]
+    ],
+    "client": {
+      "gateway": []
+    }
   },
   "scopeMappings": [
     {
