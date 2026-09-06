@@ -72,5 +72,18 @@
         "attributes": {}
       }
     ]
-  }
+  },
+  "clientScopes": [
+    {
+      "name": "roles",
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "config": {
+            "id.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
 }
