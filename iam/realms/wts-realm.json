@@ -85,5 +85,13 @@
         }
       ]
     }
+  ],
+  "scopeMappings": [
+    {
+      "clientScope": "roles",
+      "roles": [
+        "DEBUGGER"
+      ]
+    }
   ]
 }
