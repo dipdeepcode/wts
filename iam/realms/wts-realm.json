@@ -15,7 +15,7 @@
       ],
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "fullScopeAllowed": true,
+      "fullScopeAllowed": false,
       "attributes": {
         "post.logout.redirect.uris": "/*",
         "use.refresh.tokens": "true",
