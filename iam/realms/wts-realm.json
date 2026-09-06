@@ -86,7 +86,10 @@
         {
           "name": "realm roles",
           "config": {
-            "id.token.claim": "true"
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
           }
         }
       ]
