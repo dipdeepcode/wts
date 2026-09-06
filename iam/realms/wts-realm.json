@@ -63,16 +63,28 @@
   "roles": {
     "realm": [
       {
-        "id": "7885dff3-ffee-4395-a1c2-9ea5c8be6869",
         "name": "DEBUGGER",
         "description": "",
         "composite": false,
         "clientRole": false,
-        "containerId": "f49f342e-689f-47e7-bec4-d3cfb16057e4",
         "attributes": {}
       }
     ]
   },
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
+    },
+    {
+      "clientScope": "roles",
+      "roles": [
+        "DEBUGGER"
+      ]
+    }
+  ],
   "clientScopes": [
     {
       "name": "roles",
@@ -84,6 +96,34 @@
         "display.on.consent.screen": "true"
       },
       "protocolMappers": [
+        {
+          "name": "client roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "multivalued": "true",
+            "userinfo.token.claim": "false",
+            "user.attribute": "foo",
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "resource_access.${client_id}.roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "ed20b598-9f75-4080-8bf3-872e098cc3a3",
+          "name": "audience resolve",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-resolve-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
         {
           "name": "realm roles",
           "protocol": "openid-connect",
@@ -101,14 +141,6 @@
             "jsonType.label": "String"
           }
         }
-      ]
-    }
-  ],
-  "scopeMappings": [
-    {
-      "clientScope": "roles",
-      "roles": [
-        "DEBUGGER"
       ]
     }
   ]
