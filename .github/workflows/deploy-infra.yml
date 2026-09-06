@@ -81,3 +81,32 @@ jobs:
             docker compose pull rdbms iam
             docker compose up -d --remove-orphans rdbms iam dozzle
             docker image prune -f
+
+            echo "Waiting for Keycloak to become healthy..."
+            TIMEOUT=60
+            ELAPSED=0
+            while [ "$(docker inspect --format='{{.State.Health.Status}}' $(docker compose ps -q iam))" != "healthy" ]; do
+                if [ $ELAPSED -eq $TIMEOUT ]; then
+                    echo "Timed out waiting for Keycloak to start."
+                    exit 1
+                fi
+                sleep 5
+                ELAPSED=$((ELAPSED + 5))
+                echo "Still waiting... (${ELAPSED}s)"
+            done
+            echo "Keycloak is up and running!"
+            
+            docker compose exec -T iam /opt/keycloak/bin/kcadm.sh config credentials \
+              --server http://localhost:8080 \
+              --realm master \
+              --user "${{ secrets.KEYCLOAK_ADMIN_USER }}" \
+              --password "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
+            
+            REALM_NAME=${{ vars.KC_REALM_NAME }}
+            
+            if docker compose exec -T iam /opt/keycloak/bin/kcadm.sh get realms/$REALM_NAME > /dev/null 2>&1; then
+                echo "Realm '$REALM_NAME' already exists. Skipping creation."
+            else
+                echo "Creating realm '$REALM_NAME'..."
+                docker compose exec -T iam /opt/keycloak/bin/kcadm.sh create realms -s realm=$REALM_NAME -s enabled=true
+            fi
