@@ -34,10 +34,7 @@
         "tls.client.certificate.bound.access.tokens": "false",
         "display.on.consent.screen": "false",
         "token.response.type.bearer.lower-case": "false"
-      },
-      "optionalClientScopes": [
-        "tasks-service-api"
-      ]
+      }
     }
   ],
   "roles": {
