@@ -62,9 +62,12 @@
   "clientScopes": [
     {
       "name": "roles",
+      "protocol": "openid-connect",
       "protocolMappers": [
         {
           "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
           "config": {
             "multivalued": "true",
             "id.token.claim": "true",
@@ -76,9 +79,11 @@
     },
     {
       "name": "tasks-service-api",
+      "protocol": "openid-connect",
       "protocolMappers": [
         {
           "name": "Audience for tasks-service",
+          "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "config": {
             "access.token.claim": "true",
