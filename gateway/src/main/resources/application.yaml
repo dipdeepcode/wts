@@ -24,6 +24,7 @@ spring:
               - openid
               - profile
               - email
+              - offline_access
               - tasks-service-api
   session:
     store-type: jdbc
