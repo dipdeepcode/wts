@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -39,8 +40,11 @@ public class MeController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
 
-        String rawIdToken = oidcUser.getIdToken().getTokenValue();
+        var rawIdToken = oidcUser.getIdToken().getTokenValue();
         logger.info("Raw ID Token (JWT): {}", rawIdToken);
+
+        var rls = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        logger.info("Roles: {}", rls);
 
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withClientRegistrationId("keycloak")
