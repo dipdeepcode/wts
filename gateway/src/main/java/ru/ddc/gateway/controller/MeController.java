@@ -25,16 +25,12 @@ public class MeController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
 
-        var rawIdToken = oidcUser.getIdToken().getTokenValue();
-        logger.info("Raw ID Token (JWT): {}", rawIdToken);
-
-        var roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-        logger.info("Roles: {}", roles);
+        logger.info("Raw ID Token (JWT): {}", oidcUser.getIdToken().getTokenValue());
 
         return Map.of(
                 "username", oidcUser.getPreferredUsername(),
                 "email", oidcUser.getEmail(),
-                "roles", roles,
+                "roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList(),
                 "exp", oidcUser.getExpiresAt().getEpochSecond()
         );
 
