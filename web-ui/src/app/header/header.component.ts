@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthComponent } from '../auth/auth.component';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-header',
@@ -10,12 +9,4 @@ import { HttpClient } from '@angular/common/http';
   imports: [AuthComponent],
 })
 export class HeaderComponent {
-  private http = inject(HttpClient);
-
-  protected get_bff_me() {
-    this.http.get('/bff/me').subscribe({
-      next: (resp) => console.dir(resp)
-    })
-  }
-
 }
