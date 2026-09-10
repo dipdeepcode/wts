@@ -64,14 +64,6 @@
       }
     ]
   },
-  "scopeMappings": [
-    {
-      "clientScope": "roles",
-      "roles": [
-        "DEBUGGER"
-      ]
-    }
-  ],
   "clientScopes": [
     {
       "name": "roles",
@@ -106,24 +98,5 @@
         }
       ]
     }
-  ],
-  "defaultDefaultClientScopes": [
-    "role_list",
-    "saml_organization",
-    "AuthnContextClassRef",
-    "profile",
-    "email",
-    "roles",
-    "web-origins",
-    "acr",
-    "basic"
-  ],
-  "defaultOptionalClientScopes": [
-    "offline_access",
-    "address",
-    "phone",
-    "microprofile-jwt",
-    "organization",
-    "tasks-service-api"
   ]
 }
