@@ -52,7 +52,6 @@ export interface UserinfoDto {
   username: string;
   email: string;
   roles: string[];
-  exp: number;
 }
 
 export interface LoginOptionDto {

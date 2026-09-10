@@ -13,38 +13,14 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly toast = inject(ToastService);
   private readonly configService = inject(ConfigService);
-  private refreshSub?: Subscription;
   private _user = signal<User>(User.ANONYMOUS);
   user = this._user.asReadonly();
   isUserStateReady = signal<boolean>(false);
 
-  private setupAutoRefresh(user: UserinfoDto) {
-    if (user.exp > 0 && user.exp < Number.MAX_SAFE_INTEGER / 1000) {
-      const now = Date.now();
-      const expMs = user.exp * 1000;
-
-      if (expMs > now) {
-        const delay = (expMs - now) * 0.8;
-        if (delay > 2000 && delay < Number.MAX_SAFE_INTEGER) {
-          this.refreshSub = interval(delay).subscribe(() => this.refresh().subscribe());
-        }
-      }
-    }
-  }
-
   refresh(): Observable<UserinfoDto | null> {
-    this.refreshSub?.unsubscribe();
-
     return this.http.get<UserinfoDto>(this.configService.meUrl).pipe(
       tap((user) => {
-        this._user.set(
-          user && user.username
-            ? new User(user.username, user.email, user.roles)
-            : User.ANONYMOUS
-        );
-
-        this.setupAutoRefresh(user);
-
+        this._user.set(new User(user.username, user.email, user.roles));
         this.isUserStateReady.set(true);
       }),
       catchError((error) => {
