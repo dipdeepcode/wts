@@ -9,6 +9,8 @@
       "adminUrl": "$(env:FRONTEND_URL)",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
+      "publicClient": false,
+      "directAccessGrantsEnabled": false,
       "secret": "$(env:GATEWAY_CLIENT_SECRET)",
       "redirectUris": [
         "/*"
@@ -41,7 +43,8 @@
         "profile",
         "roles",
         "basic",
-        "email"
+        "email",
+        "id_token_roles"
       ],
       "optionalClientScopes": [
         "address",
@@ -66,18 +69,23 @@
   },
   "clientScopes": [
     {
-      "name": "roles",
+      "name": "id_token_roles",
+      "description": "OpenID Connect scope for add user roles to the ID token",
       "protocol": "openid-connect",
       "protocolMappers": [
         {
           "name": "realm roles",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
           "config": {
             "multivalued": "true",
+            "userinfo.token.claim": "false",
             "id.token.claim": "true",
+            "access.token.claim": "false",
             "claim.name": "realm_access.roles",
-            "jsonType.label": "String"
+            "jsonType.label": "String",
+            "introspection.token.claim": "true"
           }
         }
       ]
@@ -87,7 +95,7 @@
       "protocol": "openid-connect",
       "protocolMappers": [
         {
-          "name": "Audience for tasks-service",
+          "name": "audience for tasks-service",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "config": {
@@ -98,5 +106,33 @@
         }
       ]
     }
+  ],
+  "scopeMappings": [
+    {
+      "clientScope": "id_token_roles",
+      "roles": [
+        "DEBUGGER"
+      ]
+    }
+  ],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "saml_organization",
+    "AuthnContextClassRef",
+    "profile",
+    "email",
+    "roles",
+    "web-origins",
+    "acr",
+    "basic"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone",
+    "microprofile-jwt",
+    "organization",
+    "id_token_roles",
+    "tasks-service-api"
   ]
 }
