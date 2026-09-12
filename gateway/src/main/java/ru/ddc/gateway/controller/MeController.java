@@ -1,5 +1,7 @@
 package ru.ddc.gateway.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,10 +15,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/bff")
 public class MeController {
+    private static final Logger logger = LoggerFactory.getLogger(MeController.class);
 
     @GetMapping("/me")
     public Map<String, Object> getUserInfo(@AuthenticationPrincipal OidcUser oidcUser,
                                            Authentication authentication) {
+
+        var rawIdToken = oidcUser.getIdToken().getTokenValue();
+        logger.info("Raw ID Token (JWT): {}", rawIdToken);
 
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
