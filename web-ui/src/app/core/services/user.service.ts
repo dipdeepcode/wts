@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserinfoDto } from '../declarations';
 import { User } from '../user.model';
-import { catchError, interval, Observable, of, Subscription, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { ConfigService } from './config.service';
 import { ToastService } from './toast.service';
 
@@ -20,7 +20,7 @@ export class UserService {
   refresh(): Observable<UserinfoDto | null> {
     return this.http.get<UserinfoDto>(this.configService.meUrl).pipe(
       tap((user) => {
-        this._user.set(new User(user.username, user.email, user.roles));
+        this._user.set(new User(user.username, user.email, false, ''));
         this.isUserStateReady.set(true);
       }),
       catchError((error) => {

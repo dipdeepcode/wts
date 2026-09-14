@@ -51,7 +51,8 @@ export interface AppConfig {
 export interface UserinfoDto {
   username: string;
   email: string;
-  roles: string[];
+  can_change_logging_level: boolean;
+  current_logging_level: string;
 }
 
 export interface LoginOptionDto {
