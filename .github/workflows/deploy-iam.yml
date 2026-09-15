@@ -6,14 +6,13 @@ permissions: {}
 jobs:
 
   create_env:
-    name: Create .env file
     permissions:
       contents: read
     uses: ./.github/workflows/create_env.yml
     secrets: inherit
 
   deploy:
-    name: Deploy infrastructure
+    name: Build and deploy iam
     environment: production
     runs-on: ubuntu-22.04
     permissions:

@@ -6,7 +6,7 @@ permissions: {}
 
 jobs:
   create_env:
-    name: create env file
+    name: Create .env file
     environment: production
     runs-on: ubuntu-22.04
     permissions:
