@@ -1,7 +1,6 @@
 FROM quay.io/keycloak/keycloak:26.7.0 AS builder
 
 ENV KC_HEALTH_ENABLED=true
-ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 ENV KC_FEATURES_DISABLED=identity-brokering-api,twitter-broker
 ENV KC_HTTP_MANAGEMENT_ENABLED=true
