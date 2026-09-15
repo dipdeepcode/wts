@@ -72,7 +72,7 @@ jobs:
             cd "${{ vars.SERVER_PROJECT_PATH }}"
 
             docker compose pull iam
-            docker compose up -d --remove-orphans iam
+            docker compose up -d --remove-orphans --force-recreate iam
             docker image prune -f
 
             echo "Waiting for Keycloak to become healthy..."
