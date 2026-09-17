@@ -46,7 +46,7 @@ export interface AppConfig {
   meUrl: string;
   loginOptionsUrl: string;
   logoutUri: string;
-  loggingLevel: string;
+  loggingLevelUri: string;
 }
 
 export interface UserinfoDto {
