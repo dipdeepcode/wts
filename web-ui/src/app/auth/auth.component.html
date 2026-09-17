@@ -2,8 +2,8 @@
   @if (isUserStateReady()) {
     @if (isAuthenticated()) {
       <button (click)="setINFO()">setINFO</button>
-      <button (click)="setTRACE()">setINFO</button>
-      <button (click)="setDEBUG()">setINFO</button>
+      <button (click)="setTRACE()">setTRACE</button>
+      <button (click)="setDEBUG()">setDEBUG</button>
       <button (click)="redirectToAccountConsole()">Account Console</button>
       <app-logout />
     } @else {
