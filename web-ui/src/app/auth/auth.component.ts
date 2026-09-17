@@ -5,6 +5,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { AuthService } from '../core/services/auth.service';
 import { LoginOptionDto } from '../core/declarations';
 import { ToastService } from '../core/services/toast.service';
+import { LoggingLevelService } from '../core/services/logging-level.service';
 
 @Component({
   selector: 'app-auth',
@@ -17,6 +18,7 @@ export class AuthComponent implements OnInit {
   private readonly toast = inject(ToastService);
   protected loginOptions = signal<LoginOptionDto | undefined>(undefined);
   private userService = inject(UserService);
+  private loggingLevelService = inject(LoggingLevelService);
   protected isUserStateReady = this.userService.isUserStateReady;
   protected isAuthenticated = computed(() => this.userService.user().isAuthenticated);
 
@@ -42,5 +44,17 @@ export class AuthComponent implements OnInit {
     } catch (e) {
       this.toast.show('Invalid Account console URI');
     }
+  }
+
+  protected setINFO() {
+    this.loggingLevelService.setLoggingLevel('INFO').subscribe();
+  }
+
+  protected setTRACE() {
+    this.loggingLevelService.setLoggingLevel('TRACE').subscribe();
+  }
+
+  protected setDEBUG() {
+    this.loggingLevelService.setLoggingLevel('DEBUG').subscribe();
   }
 }

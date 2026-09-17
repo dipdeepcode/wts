@@ -29,4 +29,8 @@ export class ConfigService {
   get logoutUri(): string {
     return this.config?.logoutUri ?? '';
   }
+
+  get loggingLevelUri(): string {
+    return this.config?.loggingLevel ?? '';
+  }
 }
