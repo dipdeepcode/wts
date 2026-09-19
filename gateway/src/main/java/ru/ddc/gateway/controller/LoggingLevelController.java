@@ -36,7 +36,7 @@ public class LoggingLevelController {
         String userId = oauthToken.getPrincipal().getAttribute("sub");
 
         try {
-            tokenRefreshService.forceTokenRefresh(authentication);
+            tokenRefreshService.forceTokenRefresh(authentication, newLevel);
             return ResponseEntity.ok(Map.of("status", "success", "current_level", newLevel));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Failed to cycle token: " + e.getMessage()));

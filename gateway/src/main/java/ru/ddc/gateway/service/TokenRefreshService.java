@@ -26,7 +26,7 @@ public class TokenRefreshService {
         this.authorizedClientService = authorizedClientService;
     }
 
-    public void forceTokenRefresh(Authentication authentication) {
+    public void forceTokenRefresh(Authentication authentication, String loggingLevel) {
         if (!(authentication instanceof OAuth2AuthenticationToken oauthToken)) {
             throw new IllegalStateException("User is not authenticated via OAuth2");
         }
@@ -64,6 +64,7 @@ public class TokenRefreshService {
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withAuthorizedClient(expiredClient)
                 .principal(authentication)
+                .attribute("custom_logging_level", loggingLevel)
                 .build();
         log.info("authorizeRequest: {}", authorizeRequest);
 
