@@ -72,6 +72,7 @@ public class TokenRefreshService {
         log.info("refreshedClient: {}", refreshedClient);
 
         if (refreshedClient != null) {
+            log.info("Raw ID Token (JWT): {}", refreshedClient.getAccessToken().getTokenValue());
             // 4. Сохраняем обновленные токены обратно в Spring Session JDBC
             authorizedClientService.saveAuthorizedClient(refreshedClient, authentication);
         } else {
