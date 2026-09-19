@@ -1,9 +1,10 @@
 package ru.ddc.gateway.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequestMapping("/bff/logging-level")
 public class LoggingLevelController {
     private final TokenRefreshService tokenRefreshService;
+    private static final Logger log = LoggerFactory.getLogger(LoggingLevelController.class);
 
     public LoggingLevelController(TokenRefreshService tokenRefreshService) {
         this.tokenRefreshService = tokenRefreshService;
@@ -32,9 +34,7 @@ public class LoggingLevelController {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid logging level"));
         }
 
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        String userId = oauthToken.getPrincipal().getAttribute("sub");
-
+        log.info("newLevel: {}", newLevel);
         try {
             tokenRefreshService.forceTokenRefresh(authentication, newLevel);
             return ResponseEntity.ok(Map.of("status", "success", "current_level", newLevel));

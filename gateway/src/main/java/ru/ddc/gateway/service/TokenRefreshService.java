@@ -58,7 +58,7 @@ public class TokenRefreshService {
                 expiredAccessToken,
                 authorizedClient.getRefreshToken()
         );
-        log.info("expiredClient: {}", expiredClient);
+        log.info("expiredClient: {}", expiredClient.toString());
 
         // 3. Формируем запрос на авторизацию. Менеджер увидит expired токен и пойдет в Keycloak за новым
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
@@ -66,11 +66,11 @@ public class TokenRefreshService {
                 .principal(authentication)
                 .attribute("custom_logging_level", loggingLevel)
                 .build();
-        log.info("authorizeRequest: {}", authorizeRequest);
+        log.info("authorizeRequest: {}", authorizeRequest.toString());
 
         // Этот вызов выполнит HTTP-запрос к Keycloak /token эндпоинту с grant_type=refresh_token
         OAuth2AuthorizedClient refreshedClient = authorizedClientManager.authorize(authorizeRequest);
-        log.info("refreshedClient: {}", refreshedClient);
+        log.info("refreshedClient: {}", refreshedClient.toString());
 
         if (refreshedClient != null) {
             log.info("Raw ID Token (JWT): {}", refreshedClient.getAccessToken().getTokenValue());
