@@ -3,5 +3,5 @@
   "meUrl": "/bff/me",
   "loginOptionsUrl": "/bff/login-options",
   "logoutUri": "/logout",
-  "loggingLevelUri": "/bff/logging-level/change"
+  "loggingLevelUri": "/logging-level/change"
 }
