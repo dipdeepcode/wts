@@ -1,7 +1,6 @@
 package ru.ddc.gateway.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +21,6 @@ public class LoggingLevelController {
     }
 
     @PostMapping("/change")
-    @PreAuthorize("hasRole('LOG_LEVEL:WRITE')")
     public ResponseEntity<Map<String, String>> changeLoggingLevel(
             @RequestBody Map<String, String> request,
             Authentication authentication) {
