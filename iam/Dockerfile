@@ -5,8 +5,6 @@ ENV KC_DB=postgres
 ENV KC_FEATURES_DISABLED=identity-brokering-api,twitter-broker
 ENV KC_FEATURES=scripts
 
-COPY logging-mapper.jar /opt/keycloak/providers/
-
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:26.7.0
