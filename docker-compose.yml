@@ -52,7 +52,7 @@ services:
       KC_CACHE: local
       KC_HTTP_ACCESS_LOG_ENABLED: "true"
       KC_HTTP_ACCESS_LOG_PATTERN: "%r %s %{ALL_REQUEST_HEADERS}"
-      KC_LOG_LEVEL: "INFO,io.vertx.ext.web.impl.RouterImpl:TRACE"
+      KC_LOG_LEVEL: "INFO,io.vertx.ext.web.impl.RouterImpl=TRACE"
     ports:
       - "127.0.0.1:8085:8080"
     networks:
