@@ -2,7 +2,10 @@
   "mappers": [
     {
       "name": "Dynamic Logging Level Mapper",
-      "fileName": "set-logging-level.js"
+      "fileName": "set-logging-level.js",
+      "dialects": [
+        "openid-connect"
+      ]
     }
   ]
 }
