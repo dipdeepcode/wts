@@ -64,7 +64,7 @@ public class TokenRefreshService {
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withAuthorizedClient(expiredClient)
                 .principal(authentication)
-                .attribute("logging_level", loggingLevel)
+                .attribute("custom_logging_level", loggingLevel)
                 .build();
         log.info("authorizeRequest: {}", authorizeRequest.toString());
 
