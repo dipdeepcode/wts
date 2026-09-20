@@ -31,6 +31,6 @@ export class ConfigService {
   }
 
   get loggingLevelUri(): string {
-    return this.config?.loggingLevelUri ?? '';
+    return this.config?.loggingLevel ?? '';
   }
 }
