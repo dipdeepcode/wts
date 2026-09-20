@@ -1,7 +1,5 @@
 package ru.ddc.gateway.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -18,7 +16,6 @@ public class TokenRefreshService {
 
     private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final OAuth2AuthorizedClientService authorizedClientService;
-    private static final Logger log = LoggerFactory.getLogger(TokenRefreshService.class);
 
     public TokenRefreshService(OAuth2AuthorizedClientManager authorizedClientManager,
                                OAuth2AuthorizedClientService authorizedClientService) {
@@ -58,18 +55,15 @@ public class TokenRefreshService {
                 expiredAccessToken,
                 authorizedClient.getRefreshToken()
         );
-        log.info("expiredClient: {}", expiredClient);
 
         // 3. Формируем запрос на авторизацию. Менеджер увидит expired токен и пойдет в Keycloak за новым
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                 .withAuthorizedClient(expiredClient)
                 .principal(authentication)
                 .build();
-        log.info("authorizeRequest: {}", authorizeRequest);
 
         // Этот вызов выполнит HTTP-запрос к Keycloak /token эндпоинту с grant_type=refresh_token
         OAuth2AuthorizedClient refreshedClient = authorizedClientManager.authorize(authorizeRequest);
-        log.info("refreshedClient: {}", refreshedClient);
 
         if (refreshedClient != null) {
             // 4. Сохраняем обновленные токены обратно в Spring Session JDBC
