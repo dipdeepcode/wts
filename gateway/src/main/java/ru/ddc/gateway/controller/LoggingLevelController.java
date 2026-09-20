@@ -13,7 +13,7 @@ import ru.ddc.gateway.service.TokenRefreshService;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/logging-level")
+@RequestMapping("/logging_level")
 public class LoggingLevelController {
     private final TokenRefreshService tokenRefreshService;
 
