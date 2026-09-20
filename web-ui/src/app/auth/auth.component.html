@@ -1,11 +1,8 @@
 <span>
   @if (isUserStateReady()) {
     @if (isAuthenticated()) {
-      <button (click)="setINFO()">setINFO</button>
-      <button (click)="setTRACE()">setINFO</button>
-      <button (click)="setDEBUG()">setINFO</button>
-      <button (click)="redirectToAccountConsole()">Account Console</button>
       <app-logout />
+      <button (click)="redirectToAccountConsole()">Account Console</button>
     } @else {
       <app-login [loginOptions]="loginOptions()" />
     }

@@ -2,6 +2,5 @@
   "baseUrl": "/api/v1",
   "meUrl": "/bff/me",
   "loginOptionsUrl": "/bff/login-options",
-  "logoutUri": "/logout",
-  "loggingLevelUri": "/logging-level/change"
+  "logoutUri": "/logout"
 }
