@@ -47,6 +47,13 @@ spring:
               filters:
                 - TokenRelay=
                 - RemoveRequestHeader=Cookie
+            - id: otel-collector
+              uri: http://otel-collector:4318/
+              predicates:
+                - Path=/otel/v1/traces, /otel/v1/metrics, /otel/v1/logs
+              filters:
+                - StripPrefix=1
+                - RemoveRequestHeader=Cookie
 
 com:
   c4-soft:
@@ -70,11 +77,13 @@ com:
             - /logout/**
             - /api/**
             - /bff/**
+            - /otel/**
           permit-all:
             - /login/**
             - /oauth2/**
             - /bff/login-options
             - /logout/connect/back-channel/**
+            - /otel/**
           csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
