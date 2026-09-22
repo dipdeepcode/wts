@@ -36,6 +36,18 @@ jobs:
           source: "docker-compose.yml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
 
+      - name: Copy otel-collector-config.yaml to VDS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "otel/otel-collector-config.yaml"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+          strip_components: 1
+
+
       - name: Restart docker-compose
         uses: appleboy/ssh-action@v1.0.3
         with:

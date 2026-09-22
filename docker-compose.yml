@@ -146,6 +146,25 @@ services:
     security_opt:
       - no-new-privileges=true
 
+  jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:16686:16686"
+    networks:
+      - otel_net
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    networks:
+      - otel_net
+    depends_on:
+      - jaeger
+
 volumes:
   rdbms_vol:
     name: rdbms_vol
@@ -162,4 +181,7 @@ networks:
     driver: bridge
   dozzle-dummy_net:
     name: dozzle-dummy_net
+    driver: bridge
+  otel_net:
+    name: otel_net
     driver: bridge
