@@ -85,6 +85,7 @@ services:
       - rdbms_net
       - iam_net
       - tasks-service_net
+      - collector_net
     extra_hosts:
       - "auth.dipdeepcode.ru:212.109.223.138"
     depends_on:
@@ -162,6 +163,7 @@ services:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
     networks:
       - otel_net
+      - collector_net
     depends_on:
       - jaeger
 
@@ -184,4 +186,7 @@ networks:
     driver: bridge
   otel_net:
     name: otel_net
+    driver: bridge
+  collector_net:
+    name: collector_net
     driver: bridge
