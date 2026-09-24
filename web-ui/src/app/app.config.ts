@@ -12,6 +12,7 @@ import { halInterceptor } from './core/interceptors/hal.interceptor';
 import { ConfigService } from './core/services/config.service';
 import { UserService } from './core/services/user.service';
 import { lastValueFrom } from 'rxjs';
+import { initOtelLogger } from './core/telemetry/instrumentation';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([halInterceptor])),
     provideAppInitializer(async () => {
+      initOtelLogger();
       const configService = inject(ConfigService);
       const userService = inject(UserService);
       await configService.loadConfig();
