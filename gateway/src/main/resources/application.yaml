@@ -85,6 +85,8 @@ com:
             - /logout/connect/back-channel/**
             - /otel/**
           csrf: cookie-accessible-from-js
+          csrf-exclusions:
+            - /otel/*
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
             authentication-entry-point: UNAUTHORIZED
