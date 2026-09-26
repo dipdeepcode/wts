@@ -1,0 +1,44 @@
+name: Deploy OpenTelemetry Collector Config
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'otel/otel-collector-config.yaml'
+      - '.github/workflows/deploy-otel-config.yml'
+permissions: {}
+
+jobs:
+  deploy-config:
+    name: Deploy OpenTelemetry Collector Config
+    environment: production
+    permissions:
+      contents: read
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Copy otel-collector-config.yaml to VDS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "otel/otel-collector-config.yaml"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+          strip_components: 1
+
+      - name: Restart OpenTelemetry Collector container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd "${{ vars.SERVER_PROJECT_PATH }}"
+            docker compose up -d --no-deps otel-collector
