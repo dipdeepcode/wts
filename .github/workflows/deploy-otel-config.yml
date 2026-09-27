@@ -41,4 +41,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
-            docker compose up -d --no-deps otel-collector
+            docker compose up -d --force-recreate --no-deps otel-collector
