@@ -150,6 +150,10 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.76.0
     restart: unless-stopped
+    environment:
+      - QUERY_UI_CONFIG=/etc/jaeger-ui.json
+    volumes:
+      - ./jaeger-ui.json:/etc/jaeger-ui.json:ro
     ports:
       - "127.0.0.1:16686:16686"
     networks:
