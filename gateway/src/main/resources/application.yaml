@@ -96,6 +96,9 @@ management:
   otlp:
     tracing:
       endpoint: http://otel-collector:4317
+    metrics:
+      export:
+        url: http://otel-collector:4318/v1/metrics
   tracing:
     sampling:
       probability: 1.0
