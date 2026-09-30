@@ -116,6 +116,7 @@ services:
       - rdbms_net
       - iam_net
       - tasks-service_net
+      - collector_net
     extra_hosts:
       - "auth.dipdeepcode.ru:212.109.223.138"
     depends_on:
