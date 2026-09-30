@@ -44,3 +44,26 @@ com:
         resourceserver:
           permit-all:
             - /healthcheck
+
+management:
+  # 1. Метрики отправляются через Micrometer OTLP
+  otlp:
+    metrics:
+      export:
+        url: http://otel-collector:4318/v1/metrics
+
+  # 2. Трассировка и логи обрабатываются встроенным OpenTelemetry SDK
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://otel-collector:4318/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: http://otel-collector:4318/v1/logs
+
+  # 3. Базовые настройки сэмплирования
+  tracing:
+    sampling:
+      probability: 1.0
