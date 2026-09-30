@@ -54,9 +54,6 @@ spring:
               filters:
                 - StripPrefix=1
                 - RemoveRequestHeader=Cookie
-  otlp:
-    tracing:
-      endpoint: http://otel-collector:4317
 
 com:
   c4-soft:
@@ -96,6 +93,9 @@ com:
             enabled: true
 
 management:
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4317
   tracing:
     sampling:
       probability: 1.0
