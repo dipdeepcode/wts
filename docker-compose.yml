@@ -153,6 +153,11 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:16686:16686"
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - otel_net
 
@@ -160,8 +165,12 @@ services:
     image: otel/opentelemetry-collector-contrib:0.161.0
     restart: unless-stopped
     command: ["--config=/etc/otel-collector-config.yaml"]
+    environment:
+      - TZ=Europe/Moscow
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - "127.0.0.1:4317:4317"
     networks:
