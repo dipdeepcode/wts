@@ -3,8 +3,8 @@ package ru.ddc.gateway.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +27,7 @@ public class MeController {
         Map<String, Object> map = new HashMap<>();
         map.put("username", Objects.toString(oidcUser.getPreferredUsername(), ""));
         map.put("email", Objects.toString(oidcUser.getEmail(), ""));
-
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_LOG_LEVEL:WRITE"))) {
-            map.put("can_change_logging_level", true);
-            map.put("current_logging_level", Objects.toString(oidcUser.getIdToken().getClaimAsString("logging_level"), "default"));
-        }
+        map.put("roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
         return map;
 
