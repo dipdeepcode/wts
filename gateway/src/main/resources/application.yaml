@@ -84,7 +84,6 @@ com:
             - /oauth2/**
             - /bff/login-options
             - /logout/connect/back-channel/**
-            - /otel/**
           csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
