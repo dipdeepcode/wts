@@ -20,6 +20,8 @@ services:
       TASKS_SERVICE_DB_NAME: ${TASKS_SERVICE_DB_NAME}
       TASKS_SERVICE_DB_USER: ${TASKS_SERVICE_DB_USER}
       TASKS_SERVICE_DB_PASS: ${TASKS_SERVICE_DB_PASS}
+      OTEL_USER: ${OTEL_USER}
+      OTEL_PASS: ${OTEL_PASS}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -167,16 +169,21 @@ services:
     restart: unless-stopped
     command: ["--config=/etc/otel-collector-config.yaml"]
     environment:
-      - TZ=Europe/Moscow
+      TZ: Europe/Moscow
+      OTEL_USER: ${OTEL_USER}
+      OTEL_PASS: ${OTEL_PASS}
+      ROOT_DB_NAME: ${ROOT_DB_NAME}
+      IAM_DB_NAME: ${IAM_DB_NAME}
+      SESSIONS_DB_NAME: ${SESSIONS_DB_NAME}
+      TASKS_SERVICE_DB_NAME: ${TASKS_SERVICE_DB_NAME}
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    ports:
-      - "127.0.0.1:4317:4317"
     networks:
       - otel_net
       - collector_net
+      - rdbms_net
     depends_on:
       - jaeger
 

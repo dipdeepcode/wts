@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/srikanthccv/otelcol-jsonschema/main/schema.json
+
 receivers:
   otlp:
     protocols:
@@ -5,6 +7,17 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  postgresql:
+    endpoint: rdbms:5432
+    transport: tcp
+    username: ${OTEL_USER}
+    password: ${OTEL_PASS}
+    databases:
+      - ${ROOT_DB_NAME}
+      - ${IAM_DB_NAME}
+      - ${SESSIONS_DB_NAME}
+      - ${TASKS_SERVICE_DB_NAME}
+    collection_interval: 10s
 
 processors:
   batch:
@@ -30,6 +43,6 @@ service:
       exporters: [debug]
 
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, postgresql]
       processors: [batch]
       exporters: [debug]
