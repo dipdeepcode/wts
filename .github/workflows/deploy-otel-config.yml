@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'otel/otel-collector-config.yaml'
+      - 'observability/otel/otel-collector-config.yaml'
       - '.github/workflows/deploy-otel-config.yml'
 permissions: {}
 
@@ -28,9 +28,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "otel/otel-collector-config.yaml"
+          source: "observability/otel/otel-collector-config.yaml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
-          strip_components: 1
+          strip_components: 2
 
       - name: Restart OpenTelemetry Collector container
         uses: appleboy/ssh-action@v1.0.3

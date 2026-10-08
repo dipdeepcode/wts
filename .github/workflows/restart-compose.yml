@@ -43,9 +43,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "otel/otel-collector-config.yaml"
+          source: "observability/otel/otel-collector-config.yaml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
-          strip_components: 1
+          strip_components: 2
 
 
       - name: Restart docker-compose
