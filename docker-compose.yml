@@ -199,11 +199,28 @@ services:
     networks:
       - otel_net
 
+  grafana:
+    image: grafana/grafana:13.0-ubuntu-slim
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      TZ: Europe/Moscow
+    volumes:
+      - grafana_vol:/var/lib/grafana
+      - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./9628_rev8.json:/var/lib/grafana/dashboards/postgres-dashboard.json:ro
+    networks:
+      - otel_net
+
 volumes:
   rdbms_vol:
     name: rdbms_vol
   prometheus_vol:
     name: prometheus_vol
+  grafana_vol:
+    name: grafana_vol
 
 networks:
   rdbms_net:
