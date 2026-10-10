@@ -187,7 +187,7 @@ services:
     depends_on:
       - jaeger
     healthcheck:
-      test: ["CMD", "sh", "-c", "</dev/tcp/localhost/13133"]
+      test: ["CMD", "curl", "-f", "http://localhost:13133/health"]
       interval: 10s
       timeout: 3s
       retries: 3
