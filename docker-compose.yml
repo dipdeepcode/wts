@@ -186,14 +186,6 @@ services:
       - rdbms_net
     depends_on:
       - jaeger
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:13133/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
-    security_opt:
-      - no-new-privileges=true
 
   prometheus:
     image: prom/prometheus:v3.13.4
