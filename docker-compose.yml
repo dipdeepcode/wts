@@ -187,6 +187,18 @@ services:
     depends_on:
       - jaeger
 
+  prometheus:
+    image: prom/prometheus:v3.13.4
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_vol:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - otel_net
+
 volumes:
   rdbms_vol:
     name: rdbms_vol
@@ -210,3 +222,5 @@ networks:
   collector_net:
     name: collector_net
     driver: bridge
+  prometheus_vol:
+    name: prometheus_vol
