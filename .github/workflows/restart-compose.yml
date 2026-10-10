@@ -58,17 +58,36 @@ jobs:
           target: "${{ vars.SERVER_PROJECT_PATH }}"
           strip_components: 2
 
-      - name: Copy grafana config to VDS
+      - name: Copy grafana(9628_rev8.json) config to VDS
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: |
-            observability/grafana/dashboards/9628_rev8.json
-            observability/grafana/dashboards/dashboards.yaml
-            observability/grafana/datasources/datasources.yaml
+          source: "observability/grafana/dashboards/9628_rev8.json"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+          strip_components: 3
+
+      - name: Copy grafana(dashboards.yaml) config to VDS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "observability/grafana/dashboards/dashboards.yaml"
+          target: "${{ vars.SERVER_PROJECT_PATH }}"
+          strip_components: 3
+
+      - name: Copy grafana(datasources.yaml) config to VDS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "observability/grafana/datasources/datasources.yaml"
           target: "${{ vars.SERVER_PROJECT_PATH }}"
           strip_components: 3
 
