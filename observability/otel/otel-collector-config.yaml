@@ -12,6 +12,8 @@ receivers:
     transport: tcp
     username: ${OTEL_USER}
     password: ${OTEL_PASS}
+    tls:
+      insecure: true
     databases:
       - ${ROOT_DB_NAME}
       - ${IAM_DB_NAME}
