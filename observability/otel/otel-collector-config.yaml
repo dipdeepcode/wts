@@ -23,6 +23,25 @@ receivers:
 
 processors:
   batch: {}
+  transform/postgres_compat:
+    error_mode: ignore
+    metric_statements:
+      - context: metric
+        statements:
+          # Маппинг транзакций (Commits & Rollbacks)
+          - set(name, "pg_stat_database_xact_commit") where name == "postgresql.commits"
+          - set(name, "pg_stat_database_xact_rollback") where name == "postgresql.rollbacks"
+
+          # Маппинг чтения блоков (Cache Hit Rate)
+          - set(name, "pg_stat_database_blks_read") where name == "postgresql.blocks_read"
+          - set(name, "pg_stat_database_blks_hit") where name == "postgresql.blocks_hit"
+
+          # Маппинг сессий и строк
+          - set(name, "pg_stat_activity_count") where name == "postgresql.backends"
+          - set(name, "pg_stat_database_tup_fetched") where name == "postgresql.operations" and attributes["operation"] == "fetch"
+          - set(name, "pg_stat_database_tup_inserted") where name == "postgresql.operations" and attributes["operation"] == "insert"
+          - set(name, "pg_stat_database_tup_updated") where name == "postgresql.operations" and attributes["operation"] == "update"
+          - set(name, "pg_stat_database_tup_deleted") where name == "postgresql.operations" and attributes["operation"] == "delete"
 
 exporters:
   otlp_grpc/jaeger:
@@ -48,5 +67,5 @@ service:
 
     metrics:
       receivers: [otlp, postgresql]
-      processors: [batch]
+      processors: [transform/postgres_compat, batch]
       exporters: [prometheus, debug]
