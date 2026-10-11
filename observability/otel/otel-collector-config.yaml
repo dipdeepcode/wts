@@ -26,6 +26,8 @@ processors:
   transform/postgres_compat:
     error_mode: ignore
     metric_statements:
+      # Для простых переименований без условий по атрибутам оставляем контекст metric,
+      # так как это работает быстрее и эффективнее.
       - context: metric
         statements:
           # Маппинг транзакций (Commits & Rollbacks)
@@ -36,12 +38,17 @@ processors:
           - set(name, "pg_stat_database_blks_read") where name == "postgresql.blocks_read"
           - set(name, "pg_stat_database_blks_hit") where name == "postgresql.blocks_hit"
 
-          # Маппинг сессий и строк
+          # Маппинг сессий
           - set(name, "pg_stat_activity_count") where name == "postgresql.backends"
-          - set(name, "pg_stat_database_tup_fetched") where name == "postgresql.operations" and attributes["operation"] == "fetch"
-          - set(name, "pg_stat_database_tup_inserted") where name == "postgresql.operations" and attributes["operation"] == "insert"
-          - set(name, "pg_stat_database_tup_updated") where name == "postgresql.operations" and attributes["operation"] == "update"
-          - set(name, "pg_stat_database_tup_deleted") where name == "postgresql.operations" and attributes["operation"] == "delete"
+
+      # Для маппинга строк, где нужно проверять атрибут [operation],
+      # переключаемся на контекст datapoint.
+      - context: datapoint
+        statements:
+          - set(metric.name, "pg_stat_database_tup_fetched") where metric.name == "postgresql.operations" and attributes["operation"] == "fetch"
+          - set(metric.name, "pg_stat_database_tup_inserted") where metric.name == "postgresql.operations" and attributes["operation"] == "insert"
+          - set(metric.name, "pg_stat_database_tup_updated") where metric.name == "postgresql.operations" and attributes["operation"] == "update"
+          - set(metric.name, "pg_stat_database_tup_deleted") where metric.name == "postgresql.operations" and attributes["operation"] == "delete"
 
 exporters:
   otlp_grpc/jaeger:
