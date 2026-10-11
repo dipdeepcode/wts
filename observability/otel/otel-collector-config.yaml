@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/srikanthccv/otelcol-jsonschema/main/schema.json
-
 receivers:
   otlp:
     protocols:
@@ -26,7 +24,7 @@ processors:
   transform/postgres_compat:
     error_mode: ignore
     metric_statements:
-      # 1. Сначала правим имена самих метрик (контекст metric)
+      # 1. Исправление базовых имен метрик
       - context: metric
         statements:
           - set(name, "pg_stat_database_xact_commit") where name == "postgresql.commits"
@@ -34,19 +32,24 @@ processors:
           - set(name, "pg_stat_database_blks_read") where name == "postgresql.blocks_read"
           - set(name, "pg_stat_database_blks_hit") where name == "postgresql.blocks_hit"
           - set(name, "pg_stat_activity_count") where name == "postgresql.backends"
+          - set(name, "pg_database_size_bytes") where name == "postgresql.db_size"
 
-      # 2. Правим строки (tuples). Используем правильное имя "postgresql.rows" и атрибут "status"
+      # 2. Исправление операций со строками (Используем правильное OTel-имя "postgresql.rows" и атрибут "status")
       - context: datapoint
         statements:
-          # Переименовываем метрики по условию статус-атрибута
           - set(metric.name, "pg_stat_database_tup_fetched") where metric.name == "postgresql.rows" and attributes["status"] == "fetched"
           - set(metric.name, "pg_stat_database_tup_inserted") where metric.name == "postgresql.rows" and attributes["status"] == "inserted"
           - set(metric.name, "pg_stat_database_tup_updated") where metric.name == "postgresql.rows" and attributes["status"] == "updated"
           - set(metric.name, "pg_stat_database_tup_deleted") where metric.name == "postgresql.rows" and attributes["status"] == "deleted"
 
-          # ВАЖНО: Маппим лейбл базы данных под формат prometheus-exporter (из postgresql.database.name в datname)
+          # 3. Адаптация лейблов под дашборд Grafana 9628
+          # Переименовываем имя базы данных в "datname" (критично для переменных дашборда)
           - set(attributes["datname"], attributes["postgresql.database.name"]) where attributes["postgresql.database.name"] != nil
           - delete_key(attributes, "postgresql.database.name")
+          
+          # Переименовываем хост в "instance", чтобы Grafana понимала, откуда пришла метрика
+          - set(attributes["instance"], attributes["postgresql.instance.endpoint"]) where attributes["postgresql.instance.endpoint"] != nil
+          - delete_key(attributes, "postgresql.instance.endpoint")
 
 exporters:
   otlp_grpc/jaeger:
@@ -64,12 +67,10 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp_grpc/jaeger]
-
     logs:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug]
-
     metrics:
       receivers: [otlp, postgresql]
       processors: [transform/postgres_compat, batch]
