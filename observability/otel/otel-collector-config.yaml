@@ -26,29 +26,27 @@ processors:
   transform/postgres_compat:
     error_mode: ignore
     metric_statements:
-      # Для простых переименований без условий по атрибутам оставляем контекст metric,
-      # так как это работает быстрее и эффективнее.
+      # 1. Сначала правим имена самих метрик (контекст metric)
       - context: metric
         statements:
-          # Маппинг транзакций (Commits & Rollbacks)
           - set(name, "pg_stat_database_xact_commit") where name == "postgresql.commits"
           - set(name, "pg_stat_database_xact_rollback") where name == "postgresql.rollbacks"
-
-          # Маппинг чтения блоков (Cache Hit Rate)
           - set(name, "pg_stat_database_blks_read") where name == "postgresql.blocks_read"
           - set(name, "pg_stat_database_blks_hit") where name == "postgresql.blocks_hit"
-
-          # Маппинг сессий
           - set(name, "pg_stat_activity_count") where name == "postgresql.backends"
 
-      # Для маппинга строк, где нужно проверять атрибут [operation],
-      # переключаемся на контекст datapoint.
+      # 2. Правим строки (tuples). Используем правильное имя "postgresql.rows" и атрибут "status"
       - context: datapoint
         statements:
-          - set(metric.name, "pg_stat_database_tup_fetched") where metric.name == "postgresql.operations" and attributes["operation"] == "fetch"
-          - set(metric.name, "pg_stat_database_tup_inserted") where metric.name == "postgresql.operations" and attributes["operation"] == "insert"
-          - set(metric.name, "pg_stat_database_tup_updated") where metric.name == "postgresql.operations" and attributes["operation"] == "update"
-          - set(metric.name, "pg_stat_database_tup_deleted") where metric.name == "postgresql.operations" and attributes["operation"] == "delete"
+          # Переименовываем метрики по условию статус-атрибута
+          - set(metric.name, "pg_stat_database_tup_fetched") where metric.name == "postgresql.rows" and attributes["status"] == "fetched"
+          - set(metric.name, "pg_stat_database_tup_inserted") where metric.name == "postgresql.rows" and attributes["status"] == "inserted"
+          - set(metric.name, "pg_stat_database_tup_updated") where metric.name == "postgresql.rows" and attributes["status"] == "updated"
+          - set(metric.name, "pg_stat_database_tup_deleted") where metric.name == "postgresql.rows" and attributes["status"] == "deleted"
+
+          # ВАЖНО: Маппим лейбл базы данных под формат prometheus-exporter (из postgresql.database.name в datname)
+          - set(attributes["datname"], attributes["postgresql.database.name"]) where attributes["postgresql.database.name"] != nil
+          - delete_key(attributes, "postgresql.database.name")
 
 exporters:
   otlp_grpc/jaeger:
