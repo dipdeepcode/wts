@@ -47,9 +47,6 @@ jobs:
             set_env IAM_DB_NAME           ${{ vars.IAM_DB_NAME }}
             set_env IAM_DB_USER           ${{ secrets.IAM_DB_USER }}
             set_env IAM_DB_PASS           ${{ secrets.IAM_DB_PASS }}
-            set_env SESSIONS_DB_NAME      ${{ vars.SESSIONS_DB_NAME }}
-            set_env SESSIONS_DB_USER      ${{ secrets.SESSIONS_DB_USER }}
-            set_env SESSIONS_DB_PASS      ${{ secrets.SESSIONS_DB_PASS }}
             set_env TASKS_SERVICE_DB_NAME ${{ vars.TASKS_SERVICE_DB_NAME }}
             set_env TASKS_SERVICE_DB_USER ${{ secrets.TASKS_SERVICE_DB_USER }}
             set_env TASKS_SERVICE_DB_PASS ${{ secrets.TASKS_SERVICE_DB_PASS }}

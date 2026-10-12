@@ -26,14 +26,11 @@ spring:
               - email
               - tasks-service-api
   session:
-    store-type: jdbc
-    jdbc:
-      initialize-schema: always
-  datasource:
-    url: jdbc:postgresql://rdbms:5432/${SESSIONS_DB_NAME}
-    username: ${SESSIONS_DB_USER}
-    password: ${SESSIONS_DB_PASS}
-    driver-class-name: org.postgresql.Driver
+    store-type: redis
+  data:
+    redis:
+      host: redis-session
+      port: 6379
   cloud:
     gateway:
       server:

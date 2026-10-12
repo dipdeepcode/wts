@@ -33,7 +33,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -41,16 +41,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-session-jdbc</artifactId>
+			<artifactId>spring-boot-starter-session-data-redis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-gateway-server-webmvc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -63,12 +58,6 @@
 			<artifactId>spring-boot-starter-opentelemetry</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>net.ttddyy.observation</groupId>
-			<artifactId>datasource-micrometer-spring-boot</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-
 		<!-- Source: https://mvnrepository.com/artifact/com.c4-soft.springaddons/spring-addons-starter-oidc -->
 		<dependency>
 			<groupId>com.c4-soft.springaddons</groupId>
@@ -79,7 +68,7 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc-test</artifactId>
+			<artifactId>spring-boot-starter-data-redis-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -89,7 +78,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-session-jdbc-test</artifactId>
+			<artifactId>spring-boot-starter-session-data-redis-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
