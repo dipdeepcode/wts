@@ -5,50 +5,16 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
-  postgresql:
-    endpoint: rdbms:5432
-    transport: tcp
-    username: ${OTEL_USER}
-    password: ${OTEL_PASS}
-    tls:
-      insecure: true
-    databases:
-      - ${ROOT_DB_NAME}
-      - ${IAM_DB_NAME}
-      - ${SESSIONS_DB_NAME}
-      - ${TASKS_SERVICE_DB_NAME}
-    collection_interval: 10s
+  prometheus/postgres:
+    config:
+      scrape_configs:
+        - job_name: 'postgres_exporter'
+          scrape_interval: 10s
+          static_configs:
+            - targets: ['postgres-exporter:9187']
 
 processors:
   batch: {}
-  transform/postgres_compat:
-    error_mode: ignore
-    metric_statements:
-      # --- КОНТЕКСТ METRIC (Для изменения глобального имени метрик) ---
-      - context: metric
-        statements:
-          - set(name, "pg_stat_database_xact_commit") where name == "postgresql.commits"
-          - set(name, "pg_stat_database_xact_rollback") where name == "postgresql.rollbacks"
-          - set(name, "pg_stat_database_blks_read") where name == "postgresql.blocks_read"
-          - set(name, "pg_stat_database_blks_hit") where name == "postgresql.blocks_hit"
-          - set(name, "pg_stat_activity_count") where name == "postgresql.backends"
-          - set(name, "pg_database_size_bytes") where name == "postgresql.db_size"
-
-      # --- КОНТЕКСТ DATAPOINT (Для фильтрации по атрибутам и их переименования) ---
-      - context: datapoint
-        statements:
-          # Меняем имя метрики на уровне датапоинта (OTel сопоставит это при экспорте)
-          - set(metric.name, "pg_stat_database_tup_fetched") where metric.name == "postgresql.rows" and attributes["status"] == "fetched"
-          - set(metric.name, "pg_stat_database_tup_inserted") where metric.name == "postgresql.rows" and attributes["status"] == "inserted"
-          - set(metric.name, "pg_stat_database_tup_updated") where metric.name == "postgresql.rows" and attributes["status"] == "updated"
-          - set(metric.name, "pg_stat_database_tup_deleted") where metric.name == "postgresql.rows" and attributes["status"] == "deleted"
-
-          # Исправляем лейблы для Дашборда 9628 (Критично: datname и instance)
-          - set(attributes["datname"], attributes["postgresql.database.name"]) where attributes["postgresql.database.name"] != nil
-          - delete_key(attributes, "postgresql.database.name")
-
-          - set(attributes["instance"], attributes["postgresql.instance.endpoint"]) where attributes["postgresql.instance.endpoint"] != nil
-          - delete_key(attributes, "postgresql.instance.endpoint")
 
 exporters:
   otlp_grpc/jaeger:
@@ -71,6 +37,6 @@ service:
       processors: [batch]
       exporters: [debug]
     metrics:
-      receivers: [otlp, postgresql]
-      processors: [transform/postgres_compat, batch]
+      receivers: [otlp, prometheus/postgres]
+      processors: [batch]
       exporters: [prometheus, debug]
