@@ -1,43 +1,46 @@
 package ru.ddc.gateway.configuration;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.Collections;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class RequestLoggingFilter extends OncePerRequestFilter {
+public class RequestLoggingFilter implements WebFilter {
     private static final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        String path = request.getURI().getPath();
 
-        if (!"/healthcheck".equals(request.getRequestURI())) {
-            logger.info("Request: {} {}", request.getRequestURI(), request.getMethod());
-            Collections.list(request.getHeaderNames()).forEach(headerName ->
-                    logger.info("Request header: {} = {}", headerName, request.getHeader(headerName))
+        if (!"/healthcheck".equals(path)) {
+            // 1. Логируем входящий запрос
+            logger.info("Request: {} {}", path, request.getMethod());
+            request.getHeaders().forEach((headerName, headerValues) ->
+                    logger.info("Request header: {} = {}", headerName, String.join(", ", headerValues))
             );
-            try {
-                filterChain.doFilter(request, response);
-            } finally {
-                logger.info("Response Status: {}", response.getStatus());
-                response.getHeaderNames().forEach(headerName ->
-                        logger.info("Response header: {} = {}", headerName, response.getHeader(headerName))
+
+            // 2. Регистрируем коллбэк для логирования ответа перед тем, как он запишется в сеть
+            exchange.getResponse().beforeCommit(() -> {
+                ServerHttpResponse response = exchange.getResponse();
+                logger.info("Response Status: {}", response.getStatusCode());
+                response.getHeaders().forEach((headerName, headerValues) ->
+                        logger.info("Response header: {} = {}", headerName, String.join(", ", headerValues))
                 );
-            }
-        } else {
-            filterChain.doFilter(request, response);
+                return Mono.empty();
+            });
         }
+
+        return chain.filter(exchange);
     }
 }
+

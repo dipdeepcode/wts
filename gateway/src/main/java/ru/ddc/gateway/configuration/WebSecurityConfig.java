@@ -1,26 +1,34 @@
 package ru.ddc.gateway.configuration;
 
-import com.c4_soft.springaddons.security.oidc.starter.synchronised.client.ClientExpressionInterceptUrlRegistryPostProcessor;
-import com.c4_soft.springaddons.security.oidc.starter.synchronised.client.ClientSynchronizedHttpSecurityPostProcessor;
+import com.c4_soft.springaddons.security.oidc.starter.reactive.client.ClientAuthorizeExchangeSpecPostProcessor;
+import com.c4_soft.springaddons.security.oidc.starter.reactive.client.ClientReactiveHttpSecurityPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 
 @Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 public class WebSecurityConfig {
 
     @Bean
-    ClientSynchronizedHttpSecurityPostProcessor clientSynchronizedHttpSecurityPostProcessor() {
-        return (http) -> http.csrf(csrf -> csrf.ignoringRequestMatchers("/otel/**"));
+    ClientReactiveHttpSecurityPostProcessor clientReactiveHttpSecurityPostProcessor() {
+        return (serverHttpSecurity) -> serverHttpSecurity
+                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(
+                        new NegatedServerWebExchangeMatcher(
+                                ServerWebExchangeMatchers.pathMatchers("/otel/**")
+                        )
+                ));
     }
 
     @Bean
-    ClientExpressionInterceptUrlRegistryPostProcessor clientExpressionInterceptUrlRegistryPostProcessor() {
+    ClientAuthorizeExchangeSpecPostProcessor clientAuthorizeExchangeSpecPostProcessor() {
         return (registry) -> registry
-                .requestMatchers("/otel/**").hasAuthority("ROLE_DEBUGGER")
-                .anyRequest().authenticated();
+                .pathMatchers("/otel/**").hasAuthority("ROLE_DEBUGGER")
+                .anyExchange().authenticated();
     }
 }
+
