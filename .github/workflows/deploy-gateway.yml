@@ -69,6 +69,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd "${{ vars.SERVER_PROJECT_PATH }}"
+            
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
             docker compose pull gateway
             docker compose up -d --no-deps gateway
