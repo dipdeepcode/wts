@@ -78,7 +78,7 @@ com:
             - /oauth2/**
             - /bff/login-options
             - /logout/connect/back-channel/**
-          csrf: disabled
+          csrf: disable
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
             authentication-entry-point: UNAUTHORIZED
