@@ -33,21 +33,24 @@ spring:
       port: 6379
   cloud:
     gateway:
-      routes:
-        - id: tasks-service
-          uri: http://tasks-service:8080/
-          predicates:
-            - Path=/api, /api/**
-          filters:
-            - TokenRelay
-            - RemoveRequestHeader=Cookie
-        - id: otel-collector
-          uri: http://otel-collector:4318/
-          predicates:
-            - Path=/otel/v1/traces, /otel/v1/metrics, /otel/v1/logs
-          filters:
-            - StripPrefix=1
-            - RemoveRequestHeader=Cookie
+      server:
+        webmvc:
+          trusted-proxies: ".*"
+          routes:
+            - id: tasks-service
+              uri: http://tasks-service:8080/
+              predicates:
+                - Path=/api, /api/**
+              filters:
+                - TokenRelay=
+                - RemoveRequestHeader=Cookie
+            - id: otel-collector
+              uri: http://otel-collector:4318/
+              predicates:
+                - Path=/otel/v1/traces, /otel/v1/metrics, /otel/v1/logs
+              filters:
+                - StripPrefix=1
+                - RemoveRequestHeader=Cookie
 
 com:
   c4-soft:
@@ -78,7 +81,7 @@ com:
             - /oauth2/**
             - /bff/login-options
             - /logout/connect/back-channel/**
-          csrf: disable
+          csrf: cookie-accessible-from-js
           oauth2-redirections:
             rp-initiated-logout: ACCEPTED
             authentication-entry-point: UNAUTHORIZED

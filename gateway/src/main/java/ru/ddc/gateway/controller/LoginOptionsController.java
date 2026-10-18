@@ -1,12 +1,11 @@
 package ru.ddc.gateway.controller;
 
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.InMemoryReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.stream.StreamSupport;
@@ -14,22 +13,19 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping("/bff")
 public class LoginOptionsController {
-    private final InMemoryReactiveClientRegistrationRepository clientRegistrationRepository;
+    private final InMemoryClientRegistrationRepository clientRegistrationRepository;
 
-    // Внедряем реактивный репозиторий
-    public LoginOptionsController(InMemoryReactiveClientRegistrationRepository clientRegistrationRepository) {
+    public LoginOptionsController(InMemoryClientRegistrationRepository clientRegistrationRepository) {
         this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @GetMapping("/login-options")
-    public Mono<LoginOption> getLoginOptions() {
-        LoginOption option = StreamSupport.stream(clientRegistrationRepository.spliterator(), false)
+    public LoginOption getLoginOptions() {
+        return StreamSupport.stream(clientRegistrationRepository.spliterator(), false)
                 .filter(registration -> "keycloak".equals(registration.getRegistrationId()))
                 .map(this::buildLoginOption)
                 .findFirst()
                 .orElse(new LoginOption("", "", ""));
-
-        return Mono.just(option);
     }
 
     private LoginOption buildLoginOption(ClientRegistration registration) {
@@ -55,4 +51,5 @@ public class LoginOptionsController {
 
         return new LoginOption(label, loginUri, accountConsoleUrl);
     }
+
 }
