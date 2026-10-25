@@ -40,21 +40,21 @@ spring:
       server:
         webflux:
           trusted-proxies: ".*"
-      routes:
-        - id: tasks-service
-          uri: http://tasks-service:8080/
-          predicates:
-            - Path=/api, /api/**
-          filters:
-            - TokenRelay=
-            - RemoveRequestHeader=Cookie
-        - id: otel-collector
-          uri: http://otel-collector:4318/
-          predicates:
-            - Path=/otel/v1/traces, /otel/v1/metrics, /otel/v1/logs
-          filters:
-            - StripPrefix=1
-            - RemoveRequestHeader=Cookie
+          routes:
+            - id: tasks-service
+              uri: http://tasks-service:8080/
+              predicates:
+                - Path=/api, /api/**
+              filters:
+                - TokenRelay=
+                - RemoveRequestHeader=Cookie
+            - id: otel-collector
+              uri: http://otel-collector:4318/
+              predicates:
+                - Path=/otel/v1/traces, /otel/v1/metrics, /otel/v1/logs
+              filters:
+                - StripPrefix=1
+                - RemoveRequestHeader=Cookie
 
 com:
   c4-soft:
