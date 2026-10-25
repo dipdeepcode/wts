@@ -44,7 +44,11 @@ spring:
         - id: tasks-service
           uri: http://tasks-service:8080/
           predicates:
-            - Path=/api, /api/**
+            - name:
+                args:
+                  patterns:
+                    - /api
+                    - /api/**
           filters:
             - TokenRelay
             - RemoveRequestHeader=Cookie
