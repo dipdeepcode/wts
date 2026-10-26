@@ -4,8 +4,7 @@
 
 This repository is a polyglot microservice application named WTS. It contains:
 
-- `gateway/`: active Spring Cloud Gateway WebMVC BFF and OAuth2/OIDC login gateway.
-- `gateway-reactive/`: reactive gateway experiment; not part of `docker-compose.yml` and not deployed by observed workflows.
+- `gateway-reactive/`: active Spring Cloud Gateway (reactive/WebFlux) BFF and OAuth2/OIDC login gateway. The former `gateway/` WebMVC module was removed from the repository.
 - `tasks-service/`: Spring Boot resource-server backend with PostgreSQL, Liquibase, Spring Data JPA/REST, and per-user row filtering.
 - `web-ui/`: Angular 21 SPA using OpenTelemetry browser instrumentation.
 - `iam/`: Keycloak image and realm configuration.
@@ -25,11 +24,6 @@ Use Windows PowerShell commands from the relevant module directory.
 Run from inside each Java service directory:
 
 ```powershell
-cd gateway
-.\mvnw.cmd test
-```
-
-```powershell
 cd gateway-reactive
 .\mvnw.cmd test
 ```
@@ -42,7 +36,7 @@ cd tasks-service
 Packaging mirrors Docker builds and skips tests:
 
 ```powershell
-cd gateway
+cd gateway-reactive
 .\mvnw.cmd -DskipTests package
 ```
 
@@ -51,7 +45,7 @@ cd tasks-service
 .\mvnw.cmd -DskipTests package
 ```
 
-Java services use Java 17. Gateway and tasks-service use Spring Boot `4.1.0`; gateway-reactive uses Spring Boot `4.1.1`.
+Java services use Java 17. tasks-service uses Spring Boot `4.1.0`; gateway-reactive uses Spring Boot `4.1.1` with Spring Cloud `2025.1.3` and `com.c4-soft.springaddons:spring-addons-starter-oidc` `9.1.4`.
 
 Existing Java tests are mostly application-context smoke tests. They may require database, Keycloak, Redis, and OAuth environment variables, so failures in isolated environments are not always code defects.
 
@@ -91,7 +85,7 @@ Application services:
 - `postgres-exporter`
 - `redis-session`
 - `iam`
-- `gateway`
+- `gateway-reactive`
 - `tasks-service`
 - `dozzle`
 - `jaeger`
@@ -103,11 +97,13 @@ Observed local host bindings are intentionally bound to `127.0.0.1`:
 
 - PostgreSQL: `127.0.0.1:5432`
 - Keycloak/IAM: `127.0.0.1:8085 -> 8080`
-- Gateway: `127.0.0.1:8081 -> 8080`
+- Gateway-reactive: `127.0.0.1:8082 -> 8080`
 - Dozzle: `127.0.0.1:8888 -> 8080`
 - Jaeger: `127.0.0.1:16686`
 - Prometheus: `127.0.0.1:9090`
 - Grafana: `127.0.0.1:3000`
+
+`gateway-reactive` depends on healthy `redis-session` and `iam`, joins `iam_net`, `tasks-service_net`, `collector_net`, and `redis_net`, and maps host `auth.dipdeepcode.ru` to a fixed IP via `extra_hosts` (same for `tasks-service`). Its compose healthcheck hits `GET /healthcheck`.
 
 Do not run or assume `docker compose up` locally unless a valid `.env` file is present. The repository does not contain `.env` or `.env.example`, and `.gitignore` does not ignore `.env`. Never commit secrets or create a committed `.env` file.
 
@@ -118,7 +114,7 @@ Required environment-variable names observed across compose, application YAML, a
 ```text
 RDBMS_IMAGE
 IAM_IMAGE
-GATEWAY_IMAGE
+GATEWAY_REACTIVE_IMAGE
 TASKS_SERVICE_IMAGE
 ROOT_DB_NAME
 ROOT_DB_USER
@@ -148,19 +144,19 @@ OTEL_PASS
 The active request path is:
 
 ```text
-Browser -> Nginx host proxy -> gateway on port 8081 -> tasks-service on internal port 8080
+Browser -> Nginx host proxy -> gateway-reactive on port 8082 -> tasks-service on internal port 8080
 Browser -> Nginx host proxy -> IAM/Keycloak on port 8085
 ```
 
-The gateway is the BFF:
+The gateway-reactive module is the BFF:
 
-- It performs OIDC login against Keycloak using `IAM_ISSUER_URI`.
-- It stores sessions in Redis via `spring-session-data-redis`.
+- It performs OIDC login against Keycloak using `IAM_ISSUER_URI` (OAuth2 authorization-code flow with `scope: openid, profile, email, tasks-service-api` and forced PKCE).
+- It stores sessions in Redis (`redis-session:6379`) via `@EnableRedisWebSession` on `GatewayReactiveApplication`; session timeout is `30m`.
 - It exposes frontend-friendly endpoints:
-  - `GET /bff/me`
-  - `GET /bff/login-options`
-  - health endpoint
-- It routes API traffic:
+  - `GET /bff/me` (username, email, roles)
+  - `GET /bff/login-options` (login URI plus Keycloak account-console URL built from the issuer)
+  - `GET /healthcheck`
+- It routes API traffic via Spring Cloud Gateway WebFlux routes:
   - `/api` and `/api/**` forward to `http://tasks-service:8080/`
   - `TokenRelay` propagates the upstream access token
   - `RemoveRequestHeader=Cookie` prevents cookie leakage to backend
@@ -171,16 +167,15 @@ The gateway is the BFF:
   - forward to `http://otel-collector:4318/`
   - strip one path prefix
   - remove incoming cookies
+- It exports its own metrics/traces/logs over OTLP to `otel-collector:4318` (Micrometer OTLP metrics, built-in OpenTelemetry SDK for traces/logs, sampling probability `1.0`).
 
-The gateway also requires `ROLE_DEBUGGER` for `/otel/**`, and ignores CSRF for that path. Role authorities are mapped from Keycloak claim `$.realm_access.roles` with prefix `ROLE_`.
-
-`gateway-reactive` contains similar routing, OAuth, and Redis session configuration, but it is not part of the deployed compose service list. Prefer changing `gateway/` for production gateway behavior unless the task is explicitly to revive or evaluate reactive code.
+The gateway also requires `ROLE_DEBUGGER` for `/otel/**` and ignores CSRF for that path. Role authorities are mapped from Keycloak claim `$.realm_access.roles` with prefix `ROLE_`. CSRF is configured as `cookie-accessible-from-js`. Back-channel logout is enabled in the c4-soft client config; the Keycloak realm (`iam/realms/wts-realm.json`) points the gateway client's `backchannel.logout.url` to `http://gateway-reactive:8080/logout/connect/back-channel/keycloak`, so `/logout/connect/back-channel/**` is permit-all in the gateway security matchers.
 
 ## Security Notes
 
-- Gateway security is configured in `gateway/src/main/java/ru/ddc/gateway/configuration/WebSecurityConfig.java`.
-- Gateway uses `com.c4-soft.springaddons` client synchronized security.
-- Gateway requires authentication for normal requests; `/otel/**` has the extra `ROLE_DEBUGGER` requirement.
+- Gateway security is generated by `com.c4-soft.springaddons` reactive client synchronized security from `gateway-reactive/src/main/resources/application.yaml` (`com.c4-soft.springaddons.oidc.client`).
+- `gateway-reactive/src/main/java/ru/ddc/gatewayreactive/configuration/WebSecurityConfig.java` adds reactive post-processors: `ClientReactiveHttpSecurityPostProcessor` (CSRF exemption for `/otel/**`) and `ClientAuthorizeExchangeSpecPostProcessor` (`/otel/**` requires `ROLE_DEBUGGER`, everything else authenticated).
+- Post-login redirect allowed patterns are limited to `${FRONTEND_URL}/workspaces.*` and `${FRONTEND_URL}/?`; post-logout allows any `${FRONTEND_URL}` path. RP-initiated logout is enabled (`ACCEPTED`), unauthenticated API calls get `UNAUTHORIZED` instead of a redirect.
 - Tasks-service is a Spring Security OAuth2 resource server.
 - Tasks-service permits only `/healthcheck` without authentication.
 - Tasks-service ownership/security is enforced mostly at repository query level through `PersistenceConfig.java` and custom JPQL using `?#{principal?.claims['sub']}`.
@@ -240,7 +235,7 @@ and copies its files with `strip_components: 4` to `${{ secrets.WEB_UI_DEPLOY_TA
 
 Nginx config files live under `nginx/` and are copied to the VDS by `.github/workflows/copy-nginx-conf.yml` into `/etc/nginx/vhosts-includes` with `strip_components: 1`, followed by `nginx -t` and `systemctl reload nginx`.
 
-Observed `dipdeepcode.ru` routes proxy to `http://127.0.0.1:8081`, the gateway host binding, for:
+Observed `dipdeepcode.ru` routes proxy to `http://127.0.0.1:8082`, the gateway-reactive host binding, via one regex location for:
 
 - `/bff`
 - `/api`
@@ -249,6 +244,8 @@ Observed `dipdeepcode.ru` routes proxy to `http://127.0.0.1:8081`, the gateway h
 - `/oauth2`
 - `/login-options`
 - `/otel`
+
+All other `dipdeepcode.ru` paths serve the SPA with `try_files ... /index.html`.
 
 Observed `auth.dipdeepcode.ru` routes proxy to `http://127.0.0.1:8085`, the IAM/Keycloak host binding, and deny admin paths:
 
@@ -273,7 +270,7 @@ http://otel-collector:4318/v1/traces
 http://otel-collector:4318/v1/logs
 ```
 
-Prometheus scrapes `otel-collector:8889`. Jaeger UI is exposed on host `127.0.0.1:16686`; Grafana on `127.0.0.1:3000`; Prometheus on `127.0.0.1:9090`.
+Prometheus scrapes `otel-collector:8889` and `postgres-exporter` (which reads via the `OTEL_USER` exporter datasource on `rdbms`). Jaeger UI is exposed on host `127.0.0.1:16686`; Grafana on `127.0.0.1:3000`; Prometheus on `127.0.0.1:9090`.
 
 Relevant config files:
 
@@ -282,16 +279,20 @@ Relevant config files:
 - `observability/grafana/datasources/datasources.yaml`
 - `observability/grafana/dashboards/`
 
+On the VDS these are flattened next to `docker-compose.yml` and bind-mounted by compose as `./otel-collector-config.yaml`, `./prometheus.yml`, `./datasources.yaml`, `./dashboards.yaml`, and `./9628_rev8.json`.
+
 `.github/workflows/deploy-otel-config.yml` copies OTEL collector config and force-recreates only `otel-collector`.
 
 ## CI/CD Gotchas
 
 Deployments use GitHub Actions with SSH/SCP to a VDS. Many workflows run `create_env.yml` first to regenerate remote `.env`.
 
-Java deployments build Docker images with Maven `-DskipTests`, then copy the built jar into a layered Spring Boot runtime image based on `bellsoft/liberica-openjre-alpine:17-cds`.
+`gateway-reactive` deployments run `.github/workflows/deploy-gateway-reactive.yml` (triggered by pushes to `master` touching `gateway-reactive/**`): it builds and pushes the Docker image from the `gateway-reactive/` context using `vars.GATEWAY_REACTIVE_IMAGE_NAME`, copies `docker-compose.yml` to the VDS, then runs `docker compose pull gateway-reactive` and `docker compose up -d --no-deps gateway-reactive`. The old `deploy-gateway.yml` workflow was deleted.
+
+Java images are built with Maven `-DskipTests` inside the Dockerfile (multi-stage build), then the jar is extracted into a layered Spring Boot runtime image based on `bellsoft/liberica-openjre-alpine:17-cds` and run as non-root `appuser`.
 
 Because deploy workflows skip tests during image build, local or CI code-level verification should be done separately when needed.
 
 `web-ui` deploy workflow runs `npm ci` and production build, but does not run frontend tests.
 
-Keycloak configuration is applied through `adorsys/keycloak-config-cli` using `iam/realms/wts-realm.json`. If you change realm settings, verify both the realm JSON and related env vars/audience values used by gateway and tasks-service.
+Keycloak configuration is applied through `adorsys/keycloak-config-cli` using `iam/realms/wts-realm.json`. If you change realm settings, verify both the realm JSON and related env vars/audience values used by gateway-reactive and tasks-service, including the gateway client's back-channel logout URL.
