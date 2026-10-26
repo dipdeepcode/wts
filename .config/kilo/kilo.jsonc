@@ -1,5 +1,6 @@
 {
   "instructions": [
     ".kilo/rules/common_rules.md"
-  ]
+  ],
+  "reasoning_display": "headline"
 }
