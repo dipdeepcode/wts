@@ -21,7 +21,7 @@
       "attributes": {
         "post.logout.redirect.uris": "/*",
         "use.refresh.tokens": "true",
-        "backchannel.logout.url": "http://gateway:8080/logout/connect/back-channel/keycloak",
+        "backchannel.logout.url": "http://gateway-reactive:8080/logout/connect/back-channel/keycloak",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "require.pushed.authorization.requests": "false",
