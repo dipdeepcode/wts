@@ -5,8 +5,6 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "tasks",
@@ -35,19 +33,10 @@ public class Task {
     @ManyToOne
     @JoinColumn(
             name = "workspace_id",
+            nullable = false,
             foreignKey = @ForeignKey(name = "fk_task_workspace")
     )
     private Workspace workspace;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "files",
-            joinColumns = @JoinColumn(
-                    name = "task_id",
-                    foreignKey =  @ForeignKey(name = "fk_files_task")
-            )
-    )
-    private List<File> files = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -87,14 +76,6 @@ public class Task {
 
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
-    }
-
-    public List<File> getImages() {
-        return files;
-    }
-
-    public void setImages(List<File> files) {
-        this.files = files;
     }
 
     public Integer getOrderBy() {
