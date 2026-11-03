@@ -1,6 +1,7 @@
 package ru.ddc.tasksservice.domain.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -110,6 +111,26 @@ public class TaskFile {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!getClass().equals(Hibernate.getClass(other))) {
+            return false;
+        }
+        TaskFile that = (TaskFile) other;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }

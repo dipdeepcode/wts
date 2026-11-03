@@ -5,6 +5,8 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks",
@@ -29,6 +31,10 @@ public class Task {
     @CreatedBy
     @Column(updatable = false)
     private String createdBy;
+
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TaskFile> files = new LinkedHashSet<>();
 
     @ManyToOne
     @JoinColumn(
@@ -92,5 +98,19 @@ public class Task {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Set<TaskFile> getFiles() {
+        return files;
+    }
+
+    public void addFile(TaskFile file) {
+        files.add(file);
+        file.setTask(this);
+    }
+
+    public void removeFile(TaskFile file) {
+        files.remove(file);
+        file.setTask(null);
     }
 }
